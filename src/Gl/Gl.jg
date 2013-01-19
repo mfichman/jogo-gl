@@ -1,0 +1,43 @@
+# Copyright (c) 2010 Matt Fichman
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+# 
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, APEXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+# This file contains native definitions for OpenGL functions.
+
+COLOR_BUFFER_BIT = 0x00004000
+TRIANGLES = 0x0004
+QUADS = 0x0007
+MODELVIEW = 0x1700
+PROJECTION = 0x1701
+
+perspective(fovy Float, aspect Float, near Float, far Float) native
+viewport(x Int, y Int, width Int, height Int) native
+matrix_mode(enum Int) native 
+clear(mask Int) native
+clear_color(red Float, blue Float, green Float, alpha Float) native
+clear_depth(depth Float) native
+depth_func(enum Int) native
+enable(enum Int) native
+translatef(x Float, y Float, z Float) native
+load_identity() native
+begin(enum Int) native
+end() native
+vertex3f(x Float, y Float, z Float) native
+flush() native
+check() native

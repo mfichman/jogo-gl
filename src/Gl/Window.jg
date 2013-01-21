@@ -99,4 +99,3 @@ poll() native {
     # function should be called in a loop within a coroutine, with a yield
     # after every poll to give the I/O manager a change to run.
 }
-

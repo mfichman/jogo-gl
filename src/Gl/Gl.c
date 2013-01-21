@@ -76,7 +76,7 @@ void Gl_enable(Int val) {
 }
 
 void Gl_translatef(Float x, Float y, Float z) {
-    glTranslatef(x, y, z);
+    glTranslatef((float)x, (float)y, (float)z);
 }
 
 void Gl_load_identity() {
@@ -113,3 +113,4 @@ void Gl_init() {
 Bool Gl_supported(Int major, Int minor) {
     return gl3wIsSupported(major, minor);
 }
+

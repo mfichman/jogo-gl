@@ -18,8 +18,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-X = "String"
-
 main() Int {
     mode = Gl::VideoMode(800, 600, 0)
     window = Gl::Window(mode)
@@ -58,7 +56,7 @@ main() Int {
         Gl::vertex3f(1., -1., 0.)
         Gl::end()
         Gl::check()
-        #Gl::flush()
+        Gl::flush()
 
         window.display()
         Gl::poll()

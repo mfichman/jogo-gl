@@ -24,15 +24,7 @@
 #define GL_WINDOW_H
 
 #include "Primitives.h"
-#ifdef WINDOWS
-#include <windows.h>
-#endif
-
-typedef struct Math_Vec2i* Math_Vec2i;
-struct Math_Vec2i {
-    Int x;
-    Int y; 
-};
+#include "Math/Vec2i.h"
 
 typedef struct Gl_VideoMode* Gl_VideoMode;
 struct Gl_VideoMode {
@@ -45,25 +37,14 @@ struct Gl_VideoMode {
 
 typedef struct Gl_Window* Gl_Window;
 struct Gl_Window {
-    Ptr _vtable;
+    VoidPtr _vtable;
     U64 _refcount;
-#if defined(WINDOWS)
-    HWND handle;
-    HDC device;
-    HGLRC context;
-#elif defined(LINUX)
-#error Unsupported
-#elif defined(DARWIN)
-#error Unsupported
-#else
-#error Unsupported
-#endif
+    Int handle; 
 };
 
 Gl_Window Gl_Window__init(Gl_VideoMode mode);
 void Gl_Window__destroy(Gl_Window self);
 void Gl_Window_display(Gl_Window self);
-void Gl_Window_find_pixel_format(Gl_Window self, Gl_VideoMode mode);
 void Gl_Window_position__s(Gl_Window self, Math_Vec2i position);
 void Gl_Window_size__s(Gl_Window self, Math_Vec2i size);
 void Gl_Window_visible__s(Gl_Window self, Bool visible);
@@ -72,11 +53,9 @@ void Gl_Window_position__g(Gl_Window self, Math_Vec2i ret);
 void Gl_Window_size__g(Gl_Window self, Math_Vec2i ret);
 Bool Gl_Window_visible__g(Gl_Window self);
 Bool Gl_Window_current__g(Gl_Window self);
+void Gl_Window_reshape(int width, int height);
+void Gl_Window_idle();
 extern void Gl_Window__vtable();
 void Gl_poll();
-
-#ifdef WINDOWS
-LRESULT CALLBACK Gl_Window__wndproc(HWND, UINT, WPARAM, LPARAM);
-#endif
 
 #endif

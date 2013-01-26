@@ -21,17 +21,25 @@
  */
 
 #include <Primitives.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#if defined(WINDOWS)
 #define WIN32_LEAN_AND_MEAN
 #define VC_EXTRALEAN
 #include <windows.h>
-#include <Gl/gl3w.h>
-#include <Gl/glcorearb.h>
-#include <stdio.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
-
 #pragma comment(lib, "opengl32.lib")
 #pragma comment(lib, "glu32.lib")
+#include <Gl/gl3w.h>
+#include <Gl/glcorearb.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
+#elif defined(DARWIN)
+//#include <Gl/gl3w.h> True OpenGl 3+ support not enabled
+#include <OpenGL/gl.h>
+#include <OpenGL/glu.h>
+#elif defined(LINUX)
+#endif
 
 void Gl_check() {
     GLenum err = glGetError();
@@ -41,8 +49,8 @@ void Gl_check() {
     case GL_INVALID_VALUE: fprintf(stderr, "GL_INVALID_VALUE\n"); abort();
     case GL_INVALID_OPERATION: fprintf(stderr, "GL_INVALID_OPERATION\n"); abort();
     case GL_OUT_OF_MEMORY: fprintf(stderr, "GL_OUT_OF_MEMORY\n"); abort();
-    case GL_STACK_UNDERFLOW: fprintf(stderr, "GL_STACK_UNDERFLOW\n"); abort();
-    case GL_STACK_OVERFLOW: fprintf(stderr, "GL_STACK_OVERFLOW\n"); abort();
+    //case GL_STACK_UNDERFLOW: fprintf(stderr, "GL_STACK_UNDERFLOW\n"); abort();
+    //case GL_STACK_OVERFLOW: fprintf(stderr, "GL_STACK_OVERFLOW\n"); abort();
     default: fprintf(stderr, "Unknown OpenGL error\n"); abort();
     }
 }
@@ -104,13 +112,37 @@ void Gl_flush() {
 }
 
 void Gl_init() {
+#ifndef DARWIN
     if (gl3wInit()) {
         fprintf(stderr, "Failed to initialize OpenGL\n");
         abort(); 
     }
+#endif
 }
 
 Bool Gl_supported(Int major, Int minor) {
+#ifndef DARWIN
     return gl3wIsSupported(major, minor);
+#else
+/*
+    GLint supported_major = 0;
+    GLint supported_minor = 0;
+    glGetIntegerv(GL_MAJOR_VERSION, &supported_major);
+    glGetIntegerv(GL_MINOR_VERSION, &supported_minor);
+    printf("%s\n", glGetString(GL_VERSION));
+    printf("%d %d\n", supported_major, supported_minor);
+    if (supported_major < major) {
+        return 0;
+    }
+    if (supported_minor < minor) {
+        return 0;
+    }
+    return 1;
+*/
+
+    return 0;
+
+
+#endif
 }
 

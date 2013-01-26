@@ -87,14 +87,9 @@ Window < Object {
     display() native {
         # Displays the current context.
     }
-
-    find_pixel_format(mode VideoMode) private native {
-        # Finds the best pixel format given the current VideoMode.
-    }
 }
 
 poll() native {
-
     # Polls for and processes input events and messages for all Windows.  This
     # function should be called in a loop within a coroutine, with a yield
     # after every poll to give the I/O manager a change to run.

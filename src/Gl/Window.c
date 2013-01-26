@@ -22,181 +22,109 @@
 
 #include "Window.h"
 #include "Boot/Module.h"
+#include <stdlib.h>
+
+#if defined(WINDOWS)
 #include <windows.h>
-
-Char const* class_name = "JogoWindow";
-
+#include <glut/glut.h>
 #pragma comment(lib, "user32.lib")
 #pragma comment(lib, "gdi32.lib")
+#elif defined(DARWIN)
+#include <glut/glut.h>
+#elif defined(LINUX)
+#include <glut/glut.h>
+#endif
 
-#ifdef WINDOWS
+
 Gl_Window Gl_Window__init(Gl_VideoMode mode) {
-    // Initialize the Windows
-    WNDCLASS class;
-    DWORD style = WS_VISIBLE|WS_SYSMENU;  // FixMe: Make invisible to start
-    RECT rect = { 0, 0, mode->width, mode->height };
-    HANDLE module = GetModuleHandle(0);
-    DWORD x = 0;
-    DWORD y = 0;
-    DWORD width = mode->width;
-    DWORD height = mode->height;
-    HDC dc = GetDC(0);
     Gl_Window ret = Boot_calloc(sizeof(struct Gl_Window));
     ret->_vtable = Gl_Window__vtable;
     ret->_refcount = 1;
 
-    x = (GetDeviceCaps(dc, HORZRES) - width)/2;
-    y = (GetDeviceCaps(dc, VERTRES) - height)/2;
-    ReleaseDC(0, dc);
+    int argcp = 1;
+    char* argv[] = {"test"};
+    glutInit(&argcp, argv);
+    glutInitDisplayMode(GLUT_DOUBLE|GLUT_DEPTH|GLUT_RGBA);
+    glutInitWindowSize(mode->width, mode->height);
+    glutInitWindowPosition(0, 0);
+    ret->handle = glutCreateWindow("Jogo");
 
-    // Register window class
-    class.style = 0;
-    class.lpfnWndProc = Gl_Window__wndproc;
-    class.cbClsExtra = 0;
-    class.cbWndExtra = 0;
-    class.hInstance = GetModuleHandle(0);
-    class.hIcon = 0;
-    class.hCursor = 0;
-    class.hbrBackground = 0;
-    class.lpszMenuName = 0;
-    class.lpszClassName = class_name;
-    RegisterClass(&class);
-
-    // Create the Window
-    AdjustWindowRect(&rect, style, 0);
-    width = rect.right - rect.left;
-    height = rect.bottom - rect.top;
-    ret->handle = CreateWindow(class_name, "", style, x, y, width, height, 0, 0, module, ret);
-    ret->device = GetDC(ret->handle);
-    if (!ret->device) {
-        printf("GetDC: ");
-        Boot_abort();
-    }
-
-    // Select pixel format
-    Gl_Window_find_pixel_format(ret, mode);
-
-    ret->context = wglCreateContext(ret->device);
-    if (!ret->context) {
-        printf("wglCreateContext: ");
-        Boot_abort();
-    }
-
-    if (!wglMakeCurrent(ret->device, ret->context)) {
-        printf("wglMakeCurrent: ");
-        Boot_abort();
-    }
+    glutReshapeFunc(Gl_Window_reshape);
+    glutDisplayFunc(Gl_Window_idle);
+    glutIdleFunc(Gl_Window_idle);
 
     return ret; 
 }
 
 void Gl_Window__destroy(Gl_Window self) {
-    DestroyWindow(self->handle);
+    glutDestroyWindow(self->handle);
     Boot_free(self);
 }
 
 void Gl_Window_display(Gl_Window self) {
-    if (!SwapBuffers(self->device)) {
-        printf("SwapBuffers: ");
-        Boot_abort();
-    }
-}
-
-void Gl_Window_find_pixel_format(Gl_Window self, Gl_VideoMode mode) {
-    PIXELFORMATDESCRIPTOR pfd;
-    int index = 0;
-    memset(&pfd, 0, sizeof(pfd));
-    pfd.nSize = sizeof(pfd);
-    pfd.nVersion = 1;
-    pfd.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
-    pfd.iPixelType = PFD_TYPE_RGBA;
-    pfd.iLayerType = PFD_MAIN_PLANE;
-    pfd.cColorBits = mode->color_bits;
-    pfd.cDepthBits = mode->depth_bits;
-    pfd.cStencilBits = mode->stencil_bits;
-    pfd.cAlphaBits = (mode->color_bits == 32) ? 8 : 0;
-
-    index = ChoosePixelFormat(self->device, &pfd);
-    if (index == 0) {
-        Boot_abort();
-    }
-    if (!SetPixelFormat(self->device, index, &pfd)) {
-        Boot_abort();
-    }
-    printf("Found pixel format\n");
-}
-
-LRESULT CALLBACK Gl_Window__wndproc(HWND handle, UINT msg, WPARAM wparam, LPARAM lparam) {
-    if (WM_CREATE == msg) {
-        LONG_PTR window = (LONG_PTR)((CREATESTRUCT*)lparam)->lpCreateParams;
-        SetWindowLongPtr(handle, GWLP_USERDATA, window);
-    }
-
-    // Process window event
-    return DefWindowProc(handle, msg, wparam, lparam);
+    glutSwapBuffers();
 }
 
 void Gl_Window_position__s(Gl_Window self, Math_Vec2i pos) {
-    SetWindowPos(self->handle, 0, pos->x, pos->y, 0, 0, SWP_NOSIZE|SWP_NOZORDER);
+    abort(); 
 }
 
 void Gl_Window_size__s(Gl_Window self, Math_Vec2i size) {
-    RECT rect = {0, 0, size->x, size->y};
-    DWORD style = GetWindowLong(self->handle, GWL_STYLE);
-    Int width = 0;
-    Int height = 0;
-    AdjustWindowRect(&rect, style, 0);
-    width = rect.right - rect.left;
-    height = rect.bottom - rect.top; 
-    SetWindowPos(self->handle, 0, 0, 0, width, height, SWP_NOMOVE|SWP_NOZORDER);
+    abort();
 }
 
 void Gl_Window_visible__s(Gl_Window self, Bool visible) {
-    ShowWindow(self->handle, visible ? SW_SHOW : SW_HIDE);
+    Int save = glutGetWindow(); 
+    glutSetWindow(self->handle);
+    if (visible) {
+        glutShowWindow();
+    } else {
+        glutHideWindow();
+    } 
+    glutSetWindow(save);
 }
 
 void Gl_Window_current__s(Gl_Window self, Bool visible) {
-    if (visible) {
-        if (!wglMakeCurrent(self->device, self->context)) {
-            Boot_abort();
-        } 
-    } else if (Gl_Window_current__g(self)) {
-        if (!wglMakeCurrent(self->device, self->context)) {
-            Boot_abort();
-        }
-    }
+    glutSetWindow(self->handle);
 }
 
 void Gl_Window_position__g(Gl_Window self, Math_Vec2i ret) {
-    RECT rect;
-    GetWindowRect(self->handle, &rect);
-    ret->x = rect.left;
-    ret->y = rect.top;
+    Int save = glutGetWindow(); 
+    glutSetWindow(self->handle);
+    ret->x = glutGet(GLUT_WINDOW_X);
+    ret->y = glutGet(GLUT_WINDOW_Y);
+    glutSetWindow(save);
 }
 
 void Gl_Window_size__g(Gl_Window self, Math_Vec2i ret) {
-    RECT rect;
-    GetWindowRect(self->handle, &rect);
-    ret->x = rect.right - rect.left;
-    ret->y = rect.bottom - rect.top;
+    Int save = glutGetWindow(); 
+    glutSetWindow(self->handle);
+    ret->x = glutGet(GLUT_WINDOW_WIDTH);
+    ret->y = glutGet(GLUT_WINDOW_HEIGHT);
+    glutSetWindow(save);
 }
 
 Bool Gl_Window_visible__g(Gl_Window self) {
-    return IsWindowVisible(self->handle);
+    abort();
 }
 
 Bool Gl_Window_current__g(Gl_Window self) {
-    return self->context == wglGetCurrentContext();
+    return glutGetWindow() == self->handle;
+}
+
+void Gl_Window_reshape(int width, int height) {
+}
+
+void Gl_Window_idle() {
 }
 
 void Gl_poll() {
     // Read all queued messages, but do not block on any messages, as this will
     // block the I/O manager.  This function should be called from a coroutine.
-    MSG msg;
-    while (PeekMessage(&msg, 0, 0, 0, PM_REMOVE)) {
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
-    }
+#ifdef DARWIN
+    glutCheckLoop();
+#else
+    glutMainLoopEvent();     
+#endif
 }
 
-#endif

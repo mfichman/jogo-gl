@@ -19,16 +19,10 @@
 # SOFTWARE.
 
 main() Int {
+    
     mode = Gl::VideoMode(800, 600, 0)
     window = Gl::Window(mode)
-    
-    Gl::init()
-    if not Gl::supported(4, 3) {
-        Io::stderr().println("OpenGL 3.2 is not supported\n")
-        ret 1
-    }
-
-    Gl::viewport(0, 0, 800, 600)
+    Gl::viewport(0, 0, 800, 600) 
     Gl::check()
     Gl::matrix_mode(Gl::PROJECTION)
     Gl::check()
@@ -38,8 +32,15 @@ main() Int {
     Gl::check()
     Gl::matrix_mode(Gl::MODELVIEW)
     Gl::check()
+    Gl::init()
+#    if not Gl::supported(3, 2) {
+#        Io::stderr().println("OpenGL 3.2 is not supported\n")
+#        ret 1
+#    }
 
-    while window.visible {
+    Io::manager().reactor() func() { Gl::poll() }
+
+    while true {#window.visible {
         Gl::clear_color(1., 0., 0., 1.)
         Gl::check()
         Gl::clear(Gl::COLOR_BUFFER_BIT)
@@ -56,10 +57,8 @@ main() Int {
         Gl::vertex3f(1., -1., 0.)
         Gl::end()
         Gl::check()
-        Gl::flush()
 
         window.display()
-        Gl::poll()
         yield
     }
     ret 0

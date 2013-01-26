@@ -19,7 +19,6 @@
 # SOFTWARE.
 
 main() Int {
-    
     mode = Gl::VideoMode(800, 600, 0)
     window = Gl::Window(mode)
     Gl::viewport(0, 0, 800, 600) 
@@ -37,7 +36,6 @@ main() Int {
 #        Io::stderr().println("OpenGL 3.2 is not supported\n")
 #        ret 1
 #    }
-
     Io::manager().reactor() func() { Gl::poll() }
 
     while true {#window.visible {

@@ -21,11 +21,8 @@
  */
 
 #include "Window.h"
-#include "Coroutine.h"
 #include "Boot/Module.h"
-#include "Os/Module.h"
 #include <stdlib.h>
-#include <stdio.h>
 
 #if defined(WINDOWS)
 #include <windows.h>
@@ -48,7 +45,7 @@ Gl_Window Gl_Window__init(Gl_VideoMode mode) {
     char* argv[] = {"test"};
     glutInit(&argcp, argv);
     glutInitDisplayMode(GLUT_DOUBLE|GLUT_DEPTH|GLUT_RGBA);
-    glutInitWindowSize(mode->width, mode->height);
+    glutInitWindowSize(512, 512);
     glutInitWindowPosition(0, 0);
     ret->handle = glutCreateWindow("Jogo");
 
@@ -115,7 +112,7 @@ Bool Gl_Window_current__g(Gl_Window self) {
     return glutGetWindow() == self->handle;
 }
 
-void Gl_Window_reshape(int width, int height) {
+void Gl_Window_reshape(Int width, Int height) {
 }
 
 void Gl_Window_idle() {
@@ -124,10 +121,6 @@ void Gl_Window_idle() {
 void Gl_poll() {
     // Read all queued messages, but do not block on any messages, as this will
     // block the I/O manager.  This function should be called from a coroutine.
-    if (Coroutine__current != &Coroutine__main) {
-        Os_cpanic("Gl::poll() can't be called from a user coroutine");
-    }
-    
 #ifdef DARWIN
     glutCheckLoop();
 #else

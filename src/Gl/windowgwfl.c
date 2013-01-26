@@ -21,22 +21,22 @@
  */
 
 #include "Window.h"
-#include "Coroutine.h"
 #include "Boot/Module.h"
-#include "Os/Module.h"
 #include <stdlib.h>
-#include <stdio.h>
 
 #if defined(WINDOWS)
 #include <windows.h>
-#include <glut/glut.h>
+##include <glut/glut.h>
 #pragma comment(lib, "user32.lib")
 #pragma comment(lib, "gdi32.lib")
 #elif defined(DARWIN)
-#include <glut/glut.h>
+//#include <glut/glut.h>
+#include <gl/glfw.h>
 #elif defined(LINUX)
 #include <glut/glut.h>
 #endif
+
+#include <stdio.h>
 
 
 Gl_Window Gl_Window__init(Gl_VideoMode mode) {
@@ -44,28 +44,24 @@ Gl_Window Gl_Window__init(Gl_VideoMode mode) {
     ret->_vtable = Gl_Window__vtable;
     ret->_refcount = 1;
 
-    int argcp = 1;
-    char* argv[] = {"test"};
-    glutInit(&argcp, argv);
-    glutInitDisplayMode(GLUT_DOUBLE|GLUT_DEPTH|GLUT_RGBA);
-    glutInitWindowSize(mode->width, mode->height);
-    glutInitWindowPosition(0, 0);
-    ret->handle = glutCreateWindow("Jogo");
-
-    glutReshapeFunc(Gl_Window_reshape);
-    glutDisplayFunc(Gl_Window_idle);
-    glutIdleFunc(Gl_Window_idle);
-
+    if (!glfwInit()) {
+        fprintf(stderr, "Failed to initialize GLFW\n");
+        abort();
+    }
+    if (!glfwOpenWindow(512, 512, 8, 8, 8, 8, 24, 0, GLFW_WINDOW)) {
+        fprintf(stderr, "Could not open Window\n");
+        abort();
+    }
     return ret; 
 }
 
 void Gl_Window__destroy(Gl_Window self) {
-    glutDestroyWindow(self->handle);
+    glfwCloseWindow();
     Boot_free(self);
 }
 
 void Gl_Window_display(Gl_Window self) {
-    glutSwapBuffers();
+    glfwSwapBuffers();
 }
 
 void Gl_Window_position__s(Gl_Window self, Math_Vec2i pos) {
@@ -77,34 +73,34 @@ void Gl_Window_size__s(Gl_Window self, Math_Vec2i size) {
 }
 
 void Gl_Window_visible__s(Gl_Window self, Bool visible) {
-    Int save = glutGetWindow(); 
-    glutSetWindow(self->handle);
-    if (visible) {
-        glutShowWindow();
-    } else {
-        glutHideWindow();
-    } 
-    glutSetWindow(save);
+//    Int save = glutGetWindow(); 
+//    glutSetWindow(self->handle);
+//    if (visible) {
+//        glutShowWindow();
+//    } else {
+//        glutHideWindow();
+//    } 
+//    glutSetWindow(save);
 }
 
 void Gl_Window_current__s(Gl_Window self, Bool visible) {
-    glutSetWindow(self->handle);
+//    glutSetWindow(self->handle);
 }
 
 void Gl_Window_position__g(Gl_Window self, Math_Vec2i ret) {
-    Int save = glutGetWindow(); 
-    glutSetWindow(self->handle);
-    ret->x = glutGet(GLUT_WINDOW_X);
-    ret->y = glutGet(GLUT_WINDOW_Y);
-    glutSetWindow(save);
+//    Int save = glutGetWindow(); 
+//    glutSetWindow(self->handle);
+//    ret->x = glutGet(GLUT_WINDOW_X);
+//    ret->y = glutGet(GLUT_WINDOW_Y);
+//    glutSetWindow(save);
 }
 
 void Gl_Window_size__g(Gl_Window self, Math_Vec2i ret) {
-    Int save = glutGetWindow(); 
-    glutSetWindow(self->handle);
-    ret->x = glutGet(GLUT_WINDOW_WIDTH);
-    ret->y = glutGet(GLUT_WINDOW_HEIGHT);
-    glutSetWindow(save);
+//    Int save = glutGetWindow(); 
+//    glutSetWindow(self->handle);
+//    ret->x = glutGet(GLUT_WINDOW_WIDTH);
+//    ret->y = glutGet(GLUT_WINDOW_HEIGHT);
+//    glutSetWindow(save);
 }
 
 Bool Gl_Window_visible__g(Gl_Window self) {
@@ -112,26 +108,13 @@ Bool Gl_Window_visible__g(Gl_Window self) {
 }
 
 Bool Gl_Window_current__g(Gl_Window self) {
-    return glutGetWindow() == self->handle;
-}
-
-void Gl_Window_reshape(int width, int height) {
-}
-
-void Gl_Window_idle() {
+//    return glutGetWindow() == self->handle;
+    return 0;
 }
 
 void Gl_poll() {
     // Read all queued messages, but do not block on any messages, as this will
     // block the I/O manager.  This function should be called from a coroutine.
-    if (Coroutine__current != &Coroutine__main) {
-        Os_cpanic("Gl::poll() can't be called from a user coroutine");
-    }
-    
-#ifdef DARWIN
-    glutCheckLoop();
-#else
-    glutMainLoopEvent();     
-#endif
+    glfwPollEvents();
 }
 

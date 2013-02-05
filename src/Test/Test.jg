@@ -19,43 +19,47 @@
 # SOFTWARE.
 
 main() Int {
-    mode = Gl::VideoMode(800, 600, 0)
-    window = Gl::Window(mode)
+    mode = GlKit::VideoMode(800, 600, 32, 24, GlKit::WindowMode::WINDOWED)
+    window = GlKit::Window(mode)
     Gl::viewport(0, 0, 800, 600) 
-    Gl::check()
     Gl::matrix_mode(Gl::PROJECTION)
-    Gl::check()
     Gl::load_identity()
-    Gl::check()
-    Gl::perspective(60., 800./600., 1., 100.)
-    Gl::check()
+    Glu::perspective(60., 800./600., 1., 100.)
     Gl::matrix_mode(Gl::MODELVIEW)
-    Gl::check()
-    Gl::init()
-#    if not Gl::supported(3, 2) {
-#        Io::stderr().println("OpenGL 3.2 is not supported\n")
-#        ret 1
+    Gl::clear_color(1., 0., 0., 1.)
+#
+#
+#    shader = GlKit::Shader(fs, vs)
+#    if shader.status == GlKit::ShaderStatus::ERROR {
+#        Io::println("Error: #{shader.log}")
 #    }
-    Io::manager().reactor() func() { Gl::poll() }
 
-    while true {#window.visible {
-        Gl::clear_color(1., 0., 0., 1.)
-        Gl::check()
+    mat = GlKit::perspective(60., 800./600., 1., 100.)
+
+    buf = GlKit::Buffer(GlKit::BufferTarget::VERTEX)
+    buf.val3f(-1., -1., 0.)
+    buf.val3f(-1., 1., 0.)
+    buf.val3f(1., 1., 0.)
+    buf.val3f(1., -1., 0.)
+    buf.state = GlKit::BufferState::SYNCED
+
+    fd = File::open('shaders/Flat.frag', 'r')
+    fs = fd.readall() #1.str #fd.scanln()#fd.readall()
+    fd = File::open('shaders/Flat.vert', 'r')
+    vs = fd.readall()
+    shader = GlKit::Shader(fs, vs)
+    if shader.status == GlKit::ShaderStatus::ERROR {
+        Io::println("Error: #{shader.log}")
+    }
+
+    while true {
+        #window.visible {
         Gl::clear(Gl::COLOR_BUFFER_BIT)
-        Gl::check()
+        Gl::clear(Gl::DEPTH_BUFFER_BIT)
         Gl::load_identity()
-        Gl::check()
         Gl::translatef(0., 0., -5.)
-        Gl::check()
     
-        Gl::begin(Gl::QUADS)
-        Gl::vertex3f(-1., -1., 0.)
-        Gl::vertex3f(-1., 1., 0.)
-        Gl::vertex3f(1., 1., 0.)
-        Gl::vertex3f(1., -1., 0.)
-        Gl::end()
-        Gl::check()
-
+        buf.draw(Gl::QUADS)
         window.display()
         yield
     }

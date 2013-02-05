@@ -26,36 +26,43 @@
 #include "Primitives.h"
 #include "Math/Vec2i.h"
 
-typedef struct Gl_VideoMode* Gl_VideoMode;
-struct Gl_VideoMode {
+typedef Int GlKit_WindowMode;
+
+typedef struct GlKit_VideoMode* GlKit_VideoMode;
+struct GlKit_VideoMode {
     Int width;
     Int height;
     Int color_bits;
     Int depth_bits;
-    Int stencil_bits;
+    GlKit_WindowMode window_mode;
 };
 
-typedef struct Gl_Window* Gl_Window;
-struct Gl_Window {
+typedef struct GlKit_Window* GlKit_Window;
+struct GlKit_Window {
     VoidPtr _vtable;
     U64 _refcount;
     Int handle; 
 };
 
-Gl_Window Gl_Window__init(Gl_VideoMode mode);
-void Gl_Window__destroy(Gl_Window self);
-void Gl_Window_display(Gl_Window self);
-void Gl_Window_position__s(Gl_Window self, Math_Vec2i position);
-void Gl_Window_size__s(Gl_Window self, Math_Vec2i size);
-void Gl_Window_visible__s(Gl_Window self, Bool visible);
-void Gl_Window_current__s(Gl_Window self, Bool current);
-void Gl_Window_position__g(Gl_Window self, Math_Vec2i ret);
-void Gl_Window_size__g(Gl_Window self, Math_Vec2i ret);
-Bool Gl_Window_visible__g(Gl_Window self);
-Bool Gl_Window_current__g(Gl_Window self);
-void Gl_Window_reshape(int width, int height);
-void Gl_Window_idle();
-extern void Gl_Window__vtable();
-void Gl_poll();
+GlKit_Window GlKit_Window__init(GlKit_VideoMode mode);
+void GlKit_Window__destroy(GlKit_Window self);
+void GlKit_Window_display(GlKit_Window self);
+void GlKit_Window_position__s(GlKit_Window self, Math_Vec2i position);
+void GlKit_Window_size__s(GlKit_Window self, Math_Vec2i size);
+void GlKit_Window_visible__s(GlKit_Window self, Bool visible);
+void GlKit_Window_current__s(GlKit_Window self, Bool current);
+void GlKit_Window_position__g(GlKit_Window self, Math_Vec2i ret);
+void GlKit_Window_size__g(GlKit_Window self, Math_Vec2i ret);
+Bool GlKit_Window_visible__g(GlKit_Window self);
+Bool GlKit_Window_current__g(GlKit_Window self);
+void GlKit_Window_init_poll(GlKit_Window self);
+void GlKit_Window_reshape(int width, int height);
+void GlKit_Window_idle();
+extern void GlKit_Window__vtable();
+
+void GlKit_poll();
+
+extern GlKit_WindowMode GlKit_WindowMode_FULLSCREEN;
+extern GlKit_WindowMode GlKit_WindowMode_WINDOWED;
 
 #endif

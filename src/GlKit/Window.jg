@@ -20,18 +20,24 @@
 
 Vsync = ENABLED | DISABLED
 
+WindowMode = WINDOWED | FULLSCREEN
+
 VideoMode < Value {
     # Defines a windowed or fullscreen video mode (width, height, and bits per
     # pixel). 
     width Int
     height Int
-    bits Int 
+    color_bits Int 
+    depth_bits Int
+    window_mode WindowMode
+}
 
-    @init(w Int, h Int, b Int) {
-        width = w
-        height = h
-        bits = b
-    }
+VideoMode::@init(w Int, h Int, b Int, d Int, m WindowMode) {
+    width = w
+    height = h
+    color_bits = b
+    depth_bits = d
+    window_mode = m
 }
 
 Window < Object {
@@ -41,51 +47,57 @@ Window < Object {
     title String    
     visible Bool
     vsync Vsync
+}
 
-    @init(mode VideoMode) native {
-        # Creates a new Window with the given video mode.
-    }
+Window::@init(mode VideoMode) native {
+    # Creates a new Window with the given video mode.
+}
 
-    @destroy() native {
-        # Destroys the underlying native window.
-    }
+Window::@destroy() native {
+    # Destroys the underlying native window.
+}
 
-    position=(position Math::Vec2i) native {
-        # Sets the position of the Window in screen coordinates.
-    }
+Window::position=(position Math::Vec2i) native {
+    # Sets the position of the Window in screen coordinates.
+}
 
-    position?() native Math::Vec2i {
-        # Returns the Window position in screen coordinates.
-    }
+Window::position?() native Math::Vec2i {
+    # Returns the Window position in screen coordinates.
+}
 
-    size=(size Math::Vec2i) native {
-        # Sets the size of the Window in screen coordinates.
-    }
-    
-    size?() native Math::Vec2i {
-        # Returns the size of the Window in screen coordinates.
-    }
+Window::size=(size Math::Vec2i) native {
+    # Sets the size of the Window in screen coordinates.
+}
 
-    visible=(visible Bool) native {
-        # Shows or hides the Window.
-    }
+Window::size?() native Math::Vec2i {
+    # Returns the size of the Window in screen coordinates.
+}
 
-    visible?() native Bool {
-        # Returns true if the Window is visible.
-    }
+Window::visible=(visible Bool) native {
+    # Shows or hides the Window.
+}
 
-    current=(current Bool) native {
-        # Makes this context current or disables it if 'current' is false.  If
-        # 'current' is true, then all future OpenGL calls will use this
-        # context.
-    }
-    
-    current?() native Bool {
-        # Returns true if this context is the current context.
-    }
+Window::visible?() native Bool {
+    # Returns true if the Window is visible.
+}
 
-    display() native {
-        # Displays the current context.
+Window::current=(current Bool) native {
+    # Makes this context current or disables it if 'current' is false.  If
+    # 'current' is true, then all future OpenGL calls will use this
+    # context.
+}
+
+Window::current?() native Bool {
+    # Returns true if this context is the current context.
+}
+
+Window::display() native {
+    # Displays the current context.
+}
+
+Window::init_poll() private {
+    Io::manager().reactor() func() { 
+        GlKit::poll() 
     }
 }
 

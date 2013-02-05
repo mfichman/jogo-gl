@@ -39,44 +39,51 @@
 #endif
 
 
-Gl_Window Gl_Window__init(Gl_VideoMode mode) {
-    Gl_Window ret = Boot_calloc(sizeof(struct Gl_Window));
-    ret->_vtable = Gl_Window__vtable;
-    ret->_refcount = 1;
-
+GlKit_Window GlKit_Window__init(GlKit_VideoMode mode) {
+    static Bool init = 0;
     int argcp = 1;
     char* argv[] = {"test"};
+
+    GlKit_Window ret = Boot_calloc(sizeof(struct GlKit_Window));
+    ret->_vtable = GlKit_Window__vtable;
+    ret->_refcount = 1;
+
     glutInit(&argcp, argv);
     glutInitDisplayMode(GLUT_DOUBLE|GLUT_DEPTH|GLUT_RGBA);
     glutInitWindowSize(mode->width, mode->height);
     glutInitWindowPosition(0, 0);
     ret->handle = glutCreateWindow("Jogo");
 
-    glutReshapeFunc(Gl_Window_reshape);
-    glutDisplayFunc(Gl_Window_idle);
-    glutIdleFunc(Gl_Window_idle);
+    glutReshapeFunc(GlKit_Window_reshape);
+    glutDisplayFunc(GlKit_Window_idle);
+    glutIdleFunc(GlKit_Window_idle);
+
+    if (!init) {
+        init = 1;
+        GlKit_Window_init_poll(ret);
+    }
 
     return ret; 
 }
 
-void Gl_Window__destroy(Gl_Window self) {
+void GlKit_Window__destroy(GlKit_Window self) {
     glutDestroyWindow(self->handle);
     Boot_free(self);
 }
 
-void Gl_Window_display(Gl_Window self) {
+void GlKit_Window_display(GlKit_Window self) {
     glutSwapBuffers();
 }
 
-void Gl_Window_position__s(Gl_Window self, Math_Vec2i pos) {
+void GlKit_Window_position__s(GlKit_Window self, Math_Vec2i pos) {
     abort(); 
 }
 
-void Gl_Window_size__s(Gl_Window self, Math_Vec2i size) {
+void GlKit_Window_size__s(GlKit_Window self, Math_Vec2i size) {
     abort();
 }
 
-void Gl_Window_visible__s(Gl_Window self, Bool visible) {
+void GlKit_Window_visible__s(GlKit_Window self, Bool visible) {
     Int save = glutGetWindow(); 
     glutSetWindow(self->handle);
     if (visible) {
@@ -87,11 +94,11 @@ void Gl_Window_visible__s(Gl_Window self, Bool visible) {
     glutSetWindow(save);
 }
 
-void Gl_Window_current__s(Gl_Window self, Bool visible) {
+void GlKit_Window_current__s(GlKit_Window self, Bool visible) {
     glutSetWindow(self->handle);
 }
 
-void Gl_Window_position__g(Gl_Window self, Math_Vec2i ret) {
+void GlKit_Window_position__g(GlKit_Window self, Math_Vec2i ret) {
     Int save = glutGetWindow(); 
     glutSetWindow(self->handle);
     ret->x = glutGet(GLUT_WINDOW_X);
@@ -99,7 +106,7 @@ void Gl_Window_position__g(Gl_Window self, Math_Vec2i ret) {
     glutSetWindow(save);
 }
 
-void Gl_Window_size__g(Gl_Window self, Math_Vec2i ret) {
+void GlKit_Window_size__g(GlKit_Window self, Math_Vec2i ret) {
     Int save = glutGetWindow(); 
     glutSetWindow(self->handle);
     ret->x = glutGet(GLUT_WINDOW_WIDTH);
@@ -107,21 +114,21 @@ void Gl_Window_size__g(Gl_Window self, Math_Vec2i ret) {
     glutSetWindow(save);
 }
 
-Bool Gl_Window_visible__g(Gl_Window self) {
+Bool GlKit_Window_visible__g(GlKit_Window self) {
     abort();
 }
 
-Bool Gl_Window_current__g(Gl_Window self) {
+Bool GlKit_Window_current__g(GlKit_Window self) {
     return glutGetWindow() == self->handle;
 }
 
-void Gl_Window_reshape(int width, int height) {
+void GlKit_Window_reshape(int width, int height) {
 }
 
-void Gl_Window_idle() {
+void GlKit_Window_idle() {
 }
 
-void Gl_poll() {
+void GlKit_poll() {
     // Read all queued messages, but do not block on any messages, as this will
     // block the I/O manager.  This function should be called from a coroutine.
     if (Coroutine__current != &Coroutine__main) {

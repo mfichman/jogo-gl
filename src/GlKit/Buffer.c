@@ -22,8 +22,8 @@
 
 #include "GlKit/Buffer.h"
 #include "GlKit/Gl.h"
-#include "Boot/Module.h"
-#include "Os/Module.h"
+#include "Boot/Boot.h"
+#include "Os/Os.h"
 
 GlKit_Buffer GlKit_Buffer__init(GlKit_BufferTarget target) {
     // Initialize the OpenGL buffer

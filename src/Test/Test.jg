@@ -27,12 +27,12 @@ main() Int {
     Glu::perspective(60., 800./600., 1., 100.)
     Gl::matrix_mode(Gl::MODELVIEW)
     Gl::clear_color(1., 0., 0., 1.)
-#
-#
-#    shader = GlKit::Shader(fs, vs)
-#    if shader.status == GlKit::ShaderStatus::ERROR {
-#        Io::println("Error: #{shader.log}")
-#    }
+
+
+   shader = GlKit::Shader(fs, vs)
+    if shader.status == GlKit::ShaderStatus::ERROR {
+        Io::println("Error: #{shader.log}")
+    }
 
     mat = GlKit::perspective(60., 800./600., 1., 100.)
 
@@ -43,7 +43,7 @@ main() Int {
     buf.val3f(1., -1., 0.)
     buf.state = GlKit::BufferState::SYNCED
 
-    fd = File::open('shaders/Flat.frag', 'r')
+    fd mutable = File::open('shaders/Flat.frag', 'r')
     fs = fd.readall() #1.str #fd.scanln()#fd.readall()
     fd = File::open('shaders/Flat.vert', 'r')
     vs = fd.readall()
@@ -52,8 +52,7 @@ main() Int {
         Io::println("Error: #{shader.log}")
     }
 
-    while true {
-        #window.visible {
+    while not window.closed {
         Gl::clear(Gl::COLOR_BUFFER_BIT)
         Gl::clear(Gl::DEPTH_BUFFER_BIT)
         Gl::load_identity()
@@ -61,6 +60,7 @@ main() Int {
     
         buf.draw(Gl::QUADS)
         window.display()
+        GlKit::poll()
         yield
     }
     ret 0

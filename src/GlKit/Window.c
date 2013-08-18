@@ -21,8 +21,8 @@
  */
 
 #include "Window.h"
-#include "Boot/Module.h"
-#include "Os/Module.h"
+#include "Boot/Boot.h"
+#include "Os/Os.h"
 #include <stdlib.h>
 
 #if defined(WINDOWS)
@@ -31,7 +31,8 @@
 #pragma comment(lib, "user32.lib")
 #pragma comment(lib, "gdi32.lib")
 #elif defined(DARWIN)
-#include <GlKit/glfw.h>
+//#include <GlKit/glfw.h>
+#include <GlKit/glfw3.h>
 #elif defined(LINUX)
 #include <glut/glut.h>
 #endif
@@ -43,17 +44,18 @@ GlKit_Window GlKit_Window__init(GlKit_VideoMode mode) {
     // Initialize and open the Window using the given video mode.
     Int width = mode->width;
     Int height = mode->height;
-    Int alpha = mode->color_bits == 32 ? 8 : 0;
-    Int depth = mode->depth_bits;
-    Int type = 0;
+    //Int alpha = mode->color_bits == 32 ? 8 : 0;
+    //Int depth = mode->depth_bits;
+    GLFWmonitor* monitor = 0;
+
     GlKit_Window ret = Boot_calloc(sizeof(struct GlKit_Window));
     ret->_vtable = GlKit_Window__vtable;
     ret->_refcount = 1;
 
     if (mode->window_mode == GlKit_WindowMode_FULLSCREEN) {
-        type = GLFW_FULLSCREEN;
+        monitor = glfwGetPrimaryMonitor();
     } else if (mode->window_mode == GlKit_WindowMode_WINDOWED) {
-        type = GLFW_WINDOW;
+        //
     } else {
         Os_cpanic("Unsupported window mode");
     }
@@ -65,68 +67,72 @@ GlKit_Window GlKit_Window__init(GlKit_VideoMode mode) {
         fprintf(stderr, "Failed to initialize GLFW\n");
         abort();
     }
-    if (!glfwOpenWindow(width, height, 8, 8, 8, alpha, depth, 0, type)) {
+    ret->handle = glfwCreateWindow(width, height, "", monitor, 0);
+    if (!ret->handle) {
         fprintf(stderr, "Could not open Window\n");
         abort();
     }
+    GlKit_Window_current__s(ret, 1);
+    
     return ret; 
 }
 
 void GlKit_Window__destroy(GlKit_Window self) {
-    glfwCloseWindow();
+    glfwDestroyWindow(self->handle);
     Boot_free(self);
 }
 
 void GlKit_Window_display(GlKit_Window self) {
-    glfwSwapBuffers();
+    glfwSwapBuffers(self->handle);
 }
 
 void GlKit_Window_position__s(GlKit_Window self, Math_Vec2i pos) {
-    abort(); 
+    glfwSetWindowPos(self->handle, pos->x, pos->y);
 }
 
 void GlKit_Window_size__s(GlKit_Window self, Math_Vec2i size) {
-    abort();
+    glfwSetWindowSize(self->handle, size->x, size->y);
 }
 
 void GlKit_Window_visible__s(GlKit_Window self, Bool visible) {
-//    Int save = glutGetWindow(); 
-//    glutSetWindow(self->handle);
-//    if (visible) {
-//        glutShowWindow();
-//    } else {
-//        glutHideWindow();
-//    } 
-//    glutSetWindow(save);
+    if (visible) {
+        glfwShowWindow(self->handle);
+    } else {
+        glfwHideWindow(self->handle);
+    } 
 }
 
-void GlKit_Window_current__s(GlKit_Window self, Bool visible) {
-//    glutSetWindow(self->handle);
+void GlKit_Window_current__s(GlKit_Window self, Bool current) {
+    if (current) {
+        glfwMakeContextCurrent(self->handle);
+    } else {
+        glfwMakeContextCurrent(0);
+    } 
 }
 
 void GlKit_Window_position__g(GlKit_Window self, Math_Vec2i ret) {
-//    Int save = glutGetWindow(); 
-//    glutSetWindow(self->handle);
-//    ret->x = glutGet(GLUT_WINDOW_X);
-//    ret->y = glutGet(GLUT_WINDOW_Y);
-//    glutSetWindow(save);
+    int x = ret->x;
+    int y = ret->y;
+    glfwGetWindowPos(self->handle, &x, &y);
 }
 
 void GlKit_Window_size__g(GlKit_Window self, Math_Vec2i ret) {
-//    Int save = glutGetWindow(); 
-//    glutSetWindow(self->handle);
-//    ret->x = glutGet(GLUT_WINDOW_WIDTH);
-//    ret->y = glutGet(GLUT_WINDOW_HEIGHT);
-//    glutSetWindow(save);
+    int x = ret->x;
+    int y = ret->y;
+    glfwGetWindowSize(self->handle, &x, &y);
 }
 
 Bool GlKit_Window_visible__g(GlKit_Window self) {
     abort();
+    return 1;
 }
 
 Bool GlKit_Window_current__g(GlKit_Window self) {
-//    return glutGetWindow() == self->handle;
-    return 0;
+    return glfwGetCurrentContext() == self->handle;
+}
+
+Bool GlKit_Window_closed__g(GlKit_Window self) {
+    return glfwWindowShouldClose(self->handle);
 }
 
 void GlKit_poll() {

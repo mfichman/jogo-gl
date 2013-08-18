@@ -29,7 +29,7 @@
 #endif
 
 void Gl_shader_source(Int id, String data) {
-    GLchar const* strings = data->data;
+    GLchar const* strings = (GLchar const*)data->data;
     GLint lengths = data->length;
     glShaderSource(id, 1, &strings, &lengths);
 }

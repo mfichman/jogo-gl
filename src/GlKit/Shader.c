@@ -32,7 +32,7 @@ void GlKit_Shader_check_status(GlKit_Shader self) {
     GLint program_len = 0;
     GLint vshader_len = 0;
     GLint fshader_len = 0;
-    Char* buf = 0;
+    GLchar* buf = 0;
     glGetProgramiv(self->id, GL_LINK_STATUS, &success);
     if (success) {
         self->status = GlKit_ShaderStatus_LINKED;
@@ -45,7 +45,7 @@ void GlKit_Shader_check_status(GlKit_Shader self) {
     glGetShaderiv(self->id, GL_INFO_LOG_LENGTH, &program_len);
     self->log = String_alloc(program_len + vshader_len + fshader_len);  
     self->log->length = program_len + vshader_len + fshader_len;
-    buf = self->log->data;
+    buf = (GLchar*)self->log->data;
 
     if (vshader_len) {
        glGetShaderInfoLog(self->vertex_shader_id, vshader_len, &vshader_len, buf);

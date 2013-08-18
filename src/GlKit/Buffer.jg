@@ -28,21 +28,21 @@ Buffer < Object {
     # an OpenGL 2.0+ vertex buffer object.  Data is stored temporarily in an
     # in-memory buffer before being synced with the hardware by setting the
     # 'state' attribute.
-    state BufferState
-    target immutable BufferTarget
-    id immutable Int
-    size immutable Int
-    capacity immutable Int
+    state mutable BufferState
+    target BufferTarget
+    id Int
+    size Int
+    capacity Int
 
     DEFAULT_SIZE = 1024
 
-    @init(target BufferTarget) native
-    @destroy() native
-    val4f(x Float, y Float, z Float, w Float) native
-    val3f(x Float, y Float, z Float) native
-    val2f(x Float, y Float) native
-    val1f(x Float) native
-    state=(state BufferState) native
-    draw(mode Int) native
+    @init(target BufferTarget) native {}
+    @destroy() native {}
+    val4f(x Float, y Float, z Float, w Float) native {}
+    val3f(x Float, y Float, z Float) native {}
+    val2f(x Float, y Float) native {}
+    val1f(x Float) native {}
+    state=(state BufferState) native {}
+    draw(mode Int) native {}
     # Draws the buffer.  Mode is one of the OpenGL draw modes, i.e., GL_TRIANGLES
 }

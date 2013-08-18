@@ -22,37 +22,40 @@ ShaderStatus = LINKED | ERROR
 
 Shader < Object {
     # Represents an GPU program.  Contains a vertex and a fragment shader.
-    id immutable Int
-    fragment_shader_id immutable Int
-    vertex_shader_id immutable Int
-    status immutable ShaderStatus
-    log immutable String
+    id Int
+    fragment_shader_id Int
+    vertex_shader_id Int
+    status ShaderStatus
+    log String
 
-    check_status() native 
+    @init(fragment String, vertex String) {
+        # Creates a new GPU program from source; 'frag' is the source for the
+        # fragment shader, and 'vertex' is the source for the vertex shader.
+        fragment_shader_id = Gl::create_shader(Gl::FRAGMENT_SHADER)
+        Gl::shader_source(fragment_shader_id, fragment)
+        Gl::compile_shader(fragment_shader_id)
+    
+        vertex_shader_id = Gl::create_shader(Gl::VERTEX_SHADER)
+        Gl::shader_source(vertex_shader_id, vertex)
+        Gl::compile_shader(vertex_shader_id)
+            
+        id = Gl::create_program()
+        Gl::attach_shader(id, fragment_shader_id)
+        Gl::attach_shader(id, vertex_shader_id)
+        Gl::link_program(id)
+    
+        self.check_status()
+    }
+    
+    @destroy() {
+        # Free the GPU program and associated resources
+        Gl::delete_program(id)
+        Gl::delete_shader(fragment_shader_id)
+        Gl::delete_shader(vertex_shader_id)
+    }
+
+    check_status() private native {
+    }
 }
 
-Shader::@init(fragment String, vertex String) {
-    # Creates a new GPU program from source; 'frag' is the source for the
-    # fragment shader, and 'vertex' is the source for the vertex shader.
-    fragment_shader_id = Gl::create_shader(Gl::FRAGMENT_SHADER)
-    Gl::shader_source(fragment_shader_id, fragment)
-    Gl::compile_shader(fragment_shader_id)
-
-    vertex_shader_id = Gl::create_shader(Gl::VERTEX_SHADER)
-    Gl::shader_source(vertex_shader_id, vertex)
-    Gl::compile_shader(vertex_shader_id)
-        
-    id = Gl::create_program()
-    Gl::attach_shader(id, fragment_shader_id)
-    Gl::attach_shader(id, vertex_shader_id)
-    Gl::link_program(id)
-
-    self.check_status()
-}
-
-Shader::@destroy() {
-    Gl::delete_program(id)
-    Gl::delete_shader(fragment_shader_id)
-    Gl::delete_shader(vertex_shader_id)
-}
 

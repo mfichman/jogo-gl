@@ -41,7 +41,7 @@ typedef struct GlKit_Window* GlKit_Window;
 struct GlKit_Window {
     VoidPtr _vtable;
     U64 _refcount;
-    Int handle; 
+    VoidPtr handle; 
 };
 
 GlKit_Window GlKit_Window__init(GlKit_VideoMode mode);

@@ -18,23 +18,15 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+check() native {
+
+}
+
 main() Int {
     mode = GlKit::VideoMode(800, 600, 32, 24, GlKit::WindowMode::WINDOWED)
     window = GlKit::Window(mode)
+    Gl::clear_color(.8, .8, .8, 1.)
     Gl::viewport(0, 0, 800, 600) 
-    Gl::matrix_mode(Gl::PROJECTION)
-    Gl::load_identity()
-    Glu::perspective(60., 800./600., 1., 100.)
-    Gl::matrix_mode(Gl::MODELVIEW)
-    Gl::clear_color(1., 0., 0., 1.)
-
-
-   shader = GlKit::Shader(fs, vs)
-    if shader.status == GlKit::ShaderStatus::ERROR {
-        Io::println("Error: #{shader.log}")
-    }
-
-    mat = GlKit::perspective(60., 800./600., 1., 100.)
 
     buf = GlKit::Buffer(GlKit::BufferTarget::VERTEX)
     buf.val3f(-1., -1., 0.)
@@ -44,19 +36,38 @@ main() Int {
     buf.state = GlKit::BufferState::SYNCED
 
     fd mutable = File::open('shaders/Flat.frag', 'r')
-    fs = fd.readall() #1.str #fd.scanln()#fd.readall()
+    fs = fd.readall()
     fd = File::open('shaders/Flat.vert', 'r')
     vs = fd.readall()
     shader = GlKit::Shader(fs, vs)
     if shader.status == GlKit::ShaderStatus::ERROR {
-        Io::println("Error: #{shader.log}")
+        Io::println(shader.log)
     }
 
+
+    Gl::matrix_mode(Gl::PROJECTION)
+    Glu::perspective(60., 800./600., 1., 100.)
+    Gl::matrix_mode(Gl::MODELVIEW)
+    Gl::load_identity()
+    Gl::translatef(0., 0., -10.)
+
+    Gl::use_program(shader.id)
+    shader.projection = GlKit::perspective(60., 800./600., 1., 100.)
+    shader.view = GlKit::identity()
+    shader.model = GlKit::translated(0., 0., -2.)
+
     while not window.closed {
+
         Gl::clear(Gl::COLOR_BUFFER_BIT)
         Gl::clear(Gl::DEPTH_BUFFER_BIT)
-        Gl::load_identity()
-        Gl::translatef(0., 0., -5.)
+
+#        Gl::color3f(1., 0., 0.)
+#        Gl::begin(Gl::QUADS)
+#        Gl::vertex3f(-1., -1., 0.)
+#        Gl::vertex3f(-1., 1., 0.)
+#        Gl::vertex3f(1., 1., 0.)
+#        Gl::vertex3f(1., -1., 0.)
+#        Gl::end()
     
         buf.draw(Gl::QUADS)
         window.display()
@@ -65,3 +76,4 @@ main() Int {
     }
     ret 0
 }
+

@@ -22,11 +22,18 @@ ShaderStatus = LINKED | ERROR
 
 Shader < Object {
     # Represents an GPU program.  Contains a vertex and a fragment shader.
+    POSITION_ATTRIB = 0
+    NORMAL_ATTRIB = 1
+    TEXCOORD_ATTRIB = 2
+
     id Int
     fragment_shader_id Int
     vertex_shader_id Int
     status ShaderStatus
     log String
+    projection_matrix_loc Int
+    view_matrix_loc Int
+    model_matrix_loc Int
 
     @init(fragment String, vertex String) {
         # Creates a new GPU program from source; 'frag' is the source for the
@@ -42,11 +49,35 @@ Shader < Object {
         id = Gl::create_program()
         Gl::attach_shader(id, fragment_shader_id)
         Gl::attach_shader(id, vertex_shader_id)
-        Gl::link_program(id)
     
+        Gl::bind_attrib_location(id, POSITION_ATTRIB, 'position_in')
+        Gl::bind_attrib_location(id, NORMAL_ATTRIB, 'normal_in')
+        Gl::bind_attrib_location(id, TEXCOORD_ATTRIB, 'texcoord_in')
+
+        Gl::link_program(id)
+
         self.check_status()
+
+        projection_matrix_loc = Gl::get_uniform_location(id, 'projection_matrix')
+        view_matrix_loc = Gl::get_uniform_location(id, 'view_matrix')
+        model_matrix_loc = Gl::get_uniform_location(id, 'model_matrix')
     }
     
+    projection=(mat Matrix) {
+        # Set the projection matrix uniform (binding is always projection_matrix)
+        Gl::uniform_matrix(projection_matrix_loc, mat)
+    }
+    
+    view=(mat Matrix) {
+        # Set the view matrix uniform (binding is alwyas view_matrix)
+        Gl::uniform_matrix(view_matrix_loc, mat)
+    }
+
+    model=(mat Matrix) {
+        # Set the model matrix uniform (binding is always model_matrix)
+        Gl::uniform_matrix(model_matrix_loc, mat)
+    }
+
     @destroy() {
         # Free the GPU program and associated resources
         Gl::delete_program(id)
@@ -55,6 +86,7 @@ Shader < Object {
     }
 
     check_status() private native {
+        # Checks the status of the shader compilation.
     }
 }
 

@@ -34,7 +34,7 @@ struct GlKit_Buffer {
     Int id;  
     Int size;
     Int capacity;
-    Char* data; 
+    Byte* data; 
 };
 
 GlKit_Buffer GlKit_Buffer__init();

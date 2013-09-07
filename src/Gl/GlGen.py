@@ -107,6 +107,8 @@ def print_c_func(name, ret, args):
 
 def parse_func(token):
     # Parses a function and then emits the native code/Jogo header
+    print token
+
     filt = []
     for i,tok in enumerate(token):
         if tok == 'const': continue

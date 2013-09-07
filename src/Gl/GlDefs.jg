@@ -18,4 +18,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+# These are gl* functions that the GlGen.py script isn't sophisticated enough
+# to parse yet.  They are included here manually.
+
 shader_source(id Int, source String) native
+get_uniform_location(id Int, name String) native Int
+bind_attrib_location(id Int, index Int, name String) native
+uniform_matrix(index Int, matrix GlKit::Matrix) native
+
+

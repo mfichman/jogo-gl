@@ -21,6 +21,7 @@
  */
 
 #include "GlKit/Buffer.h"
+#include "GlKit/Shader.h"
 #include "GlKit/Gl.h"
 #include "Boot/Boot.h"
 #include "Os/Os.h"
@@ -69,14 +70,14 @@ void GlKit_Buffer_val1f(GlKit_Buffer self, Float x) {
     // Add a new data to the buffer, and resize if necessary to fit
     GLfloat fx = x;
     if ((self->capacity - self->size) < sizeof(fx)) {
-        Int capacity = self->capacity * 2;
-        Char* data = Boot_malloc(capacity);
+        Int capacity = self->capacity * 2;  
+        Byte* data = Boot_malloc(capacity);
         Boot_memcpy(data, self->data, self->size);
         Boot_free(self->data);
         self->data = data;
         self->capacity = capacity;
     }
-    Boot_memcpy(self->data + self->size, &fx, sizeof(fx));
+    Boot_memcpy(self->data+self->size, &fx, sizeof(fx));
     self->size += sizeof(fx);
     self->state = GlKit_BufferState_DIRTY;
 }
@@ -109,10 +110,10 @@ void GlKit_Buffer_clear(GlKit_Buffer self) {
 void GlKit_Buffer_draw(GlKit_Buffer self, Int mode) {
     if (GlKit_BufferTarget_VERTEX == self->target) {
         glBindBuffer(GL_ARRAY_BUFFER, self->id);
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+        glEnableVertexAttribArray(GlKit_Shader_POSITION_ATTRIB);
+        glVertexAttribPointer(GlKit_Shader_POSITION_ATTRIB, 3, GL_FLOAT, GL_FALSE, 0, 0);
         glDrawArrays(mode, 0, self->size / 3 / sizeof(GLfloat)); 
-        glDisableVertexAttribArray(0);
+        glDisableVertexAttribArray(GlKit_Shader_POSITION_ATTRIB);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     } else if (GlKit_BufferTarget_ELEMENT == self->target) {
         Os_cpanic("Unsupported: can't draw an ELEMENT buffer");

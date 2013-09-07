@@ -35,6 +35,12 @@ struct GlKit_Shader {
     String log;
 };
 
+Int GlKit_Shader_get_uniform_location(GlKit_Shader self, String name);
+void GlKit_Shader_bind_attrib_location(GlKit_Shader self, Int index, String name);
 void GlKit_Shader_check_status(GlKit_Shader self);
 extern GlKit_ShaderStatus GlKit_ShaderStatus_ERROR;
 extern GlKit_ShaderStatus GlKit_ShaderStatus_LINKED;
+extern Int GlKit_Shader_POSITION_ATTRIB;
+extern Int GlKit_Shader_NORMAL_ATTRIB;
+extern Int GlKit_Shader_TEXCOORD_ATTRIB;
+

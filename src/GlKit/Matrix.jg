@@ -39,19 +39,44 @@ Matrix < Value {
     m31 mutable Float
     m32 mutable Float
     m33 mutable Float
-
-    uniform(location Int) native {}
 }
 
 perspective(fovy Float, aspect Float, near Float, far Float) Matrix {
-    top = (fovy * Math::PI / 360.).tan + near
+    # Returns a perspective projection matrix transformation
+    top = (fovy * Math::PI / 360.).tan * near
     bottom = -top
     right = aspect * top
     left = aspect * bottom
     ret frustum(left, right, bottom, top, near, far) 
 }
 
+ortho(left Float, right Float, bottom Float, top Float, near Float, far Float) Matrix {
+    # Returns an orthographic projection matrix 
+    out = Matrix()
+    out.m00 = 2.*near/(right-left)
+    out.m01 = 0.
+    out.m02 = 0.
+    out.m03 = -(right+left)/(right-left)
+    
+    out.m10 = 0.
+    out.m11 = 2./(top-bottom)
+    out.m12 = 0.
+    out.m13 = -(top+bottom)/(top-bottom)
+
+    out.m20 = 0.
+    out.m21 = 0.
+    out.m22 = -2./(far-near)
+    out.m23 = -(far+near)/(far-near)
+    
+    out.m30 = 0.
+    out.m31 = 0.    
+    out.m32 = 0.
+    out.m33 = 1.
+    ret out
+}
+
 frustum(left Float, right Float, bottom Float, top Float, near Float, far Float) Matrix {
+    # Returns a matrix for a viewing frustum
     out = Matrix()
     out.m00 = 2.*near/(right-left)
     out.m01 = 0.
@@ -72,5 +97,54 @@ frustum(left Float, right Float, bottom Float, top Float, near Float, far Float)
     out.m31 = 0.
     out.m32 = -1.
     out.m33 = 0.
+    ret out
+}
+
+identity() Matrix {
+    # Returns the identity matrix
+    out = Matrix()
+    out.m00 = 1.
+    out.m01 = 0.
+    out.m02 = 0.
+    out.m03 = 0.
+    
+    out.m10 = 0.
+    out.m11 = 1.
+    out.m12 = 0. 
+    out.m13 = 0.
+    
+    out.m20 = 0.
+    out.m21 = 0.
+    out.m22 = 1.
+    out.m23 = 0.
+
+    out.m30 = 0.
+    out.m31 = 0.
+    out.m32 = 0.
+    out.m33 = 1.
+    ret out
+}
+
+translated(x Float, y Float, z Float) Matrix {
+    out = Matrix()
+    out.m00 = 1. # row 1 
+    out.m01 = 0.
+    out.m02 = 0.
+    out.m03 = x
+    
+    out.m10 = 0. # row 2
+    out.m11 = 1.
+    out.m12 = 0. 
+    out.m13 = y
+    
+    out.m20 = 0. # row 3
+    out.m21 = 0.
+    out.m22 = 1.
+    out.m23 = z
+
+    out.m30 = 0. # row 4
+    out.m31 = 0.
+    out.m32 = 0.
+    out.m33 = 1.
     ret out
 }

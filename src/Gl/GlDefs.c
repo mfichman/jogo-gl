@@ -22,6 +22,7 @@
 
 #include "Primitives.h"
 #include "String.h"
+#include "GlKit/Matrix.h"
 #ifdef DARWIN
 #include <OpenGL/GL.h>
 #else
@@ -34,3 +35,22 @@ void Gl_shader_source(Int id, String data) {
     glShaderSource(id, 1, &strings, &lengths);
 }
 
+
+Int Gl_get_uniform_location(Int id, String name) {
+    return glGetUniformLocation(id, (GLchar*)name->data);
+}
+
+void Gl_bind_attrib_location(Int id, Int index, String name) {
+    glBindAttribLocation(id, index, (GLchar*)name->data);
+}
+
+void Gl_uniform_matrix(Int index, GlKit_Matrix matrix) {
+    GLsizei const count = 1;
+    GLboolean const transpose = 1;
+    GLfloat data[16]; 
+    GLdouble* in = (GLdouble*)matrix;
+    for (Int i = 0; i < 16; ++i) {
+        data[i] = in[i];
+    } 
+    glUniformMatrix4fv(index, count, transpose, data);
+}

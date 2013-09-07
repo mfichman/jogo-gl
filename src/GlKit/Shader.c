@@ -37,8 +37,9 @@ void GlKit_Shader_check_status(GlKit_Shader self) {
     if (success) {
         self->status = GlKit_ShaderStatus_LINKED;
         return;
+    } else {
+        self->status = GlKit_ShaderStatus_ERROR;
     }
-    self->status = GlKit_ShaderStatus_ERROR;
         
     glGetShaderiv(self->vertex_shader_id, GL_INFO_LOG_LENGTH, &vshader_len);
     glGetShaderiv(self->fragment_shader_id, GL_INFO_LOG_LENGTH, &fshader_len);

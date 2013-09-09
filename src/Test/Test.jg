@@ -44,31 +44,15 @@ main() Int {
         Io::println(shader.log)
     }
 
-
-    Gl::matrix_mode(Gl::PROJECTION)
-    Glu::perspective(60., 800./600., 1., 100.)
-    Gl::matrix_mode(Gl::MODELVIEW)
-    Gl::load_identity()
-    Gl::translatef(0., 0., -10.)
-
     Gl::use_program(shader.id)
     shader.projection = GlKit::perspective(60., 800./600., 1., 100.)
     shader.view = GlKit::identity()
     shader.model = GlKit::translated(0., 0., -2.)
 
     while not window.closed {
-
         Gl::clear(Gl::COLOR_BUFFER_BIT)
         Gl::clear(Gl::DEPTH_BUFFER_BIT)
 
-#        Gl::color3f(1., 0., 0.)
-#        Gl::begin(Gl::QUADS)
-#        Gl::vertex3f(-1., -1., 0.)
-#        Gl::vertex3f(-1., 1., 0.)
-#        Gl::vertex3f(1., 1., 0.)
-#        Gl::vertex3f(1., -1., 0.)
-#        Gl::end()
-    
         buf.draw(Gl::QUADS)
         window.display()
         GlKit::poll()

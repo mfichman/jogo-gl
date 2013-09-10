@@ -40,9 +40,7 @@ GlKit_Window GlKit_Window__init(GlKit_VideoMode mode) {
     Int height = mode->height;
     //Int alpha = mode->color_bits == 32 ? 8 : 0;
     //Int depth = mode->depth_bits;
-#ifndef DARWIN
     GLenum err = 0;
-#endif
     GLFWmonitor* monitor = 0;
 
     GlKit_Window ret = Boot_calloc(sizeof(struct GlKit_Window));
@@ -71,14 +69,12 @@ GlKit_Window GlKit_Window__init(GlKit_VideoMode mode) {
     }
     GlKit_Window_current__s(ret, 1);
 
-#ifndef DARWIN
     glewExperimental = 1; 
     err = glewInit();
     if (GLEW_OK != err) {
         fprintf(stderr, "%s", glewGetErrorString(err));
         abort();
     }
-#endif
 
     return ret; 
 }

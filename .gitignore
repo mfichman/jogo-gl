@@ -2,3 +2,6 @@ build
 bin
 lib
 *.swp
+.DS_store
+.jgmake
+

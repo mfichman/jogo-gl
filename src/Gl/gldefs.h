@@ -29,6 +29,7 @@
 #pragma comment(lib, "opengl32.lib")
 #pragma comment(lib, "glu32.lib")
 #elif defined(DARWIN)
+#include <Gl/glew.h>
 #include <OpenGL/gl.h>
 #elif defined(LINUX)
 #error Not supported

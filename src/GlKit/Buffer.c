@@ -22,7 +22,7 @@
 
 #include "GlKit/Buffer.h"
 #include "GlKit/Shader.h"
-#include "GlKit/Gl.h"
+#include "Gl/GlDefs.h"
 #include "Boot/Boot.h"
 #include "Os/Os.h"
 

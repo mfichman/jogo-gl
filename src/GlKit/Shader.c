@@ -21,7 +21,7 @@
  */
 
 #include "GlKit/Shader.h"
-#include "GlKit/Gl.h"
+#include "Gl/GlDefs.h"
 #include "String.h"
 
 #include <stdio.h>

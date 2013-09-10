@@ -22,12 +22,8 @@
 
 #include "Primitives.h"
 #include "String.h"
+#include "Gl/GlDefs.h"
 #include "GlKit/Matrix.h"
-#ifdef DARWIN
-#include <OpenGL/GL.h>
-#else
-#error Not implemented
-#endif
 
 void Gl_shader_source(Int id, String data) {
     GLchar const* strings = (GLchar const*)data->data;
@@ -49,7 +45,8 @@ void Gl_uniform_matrix(Int index, GlKit_Matrix matrix) {
     GLboolean const transpose = 1;
     GLfloat data[16]; 
     GLdouble* in = (GLdouble*)matrix;
-    for (Int i = 0; i < 16; ++i) {
+    Int i = 0;
+    for (i = 0; i < 16; ++i) {
         data[i] = in[i];
     } 
     glUniformMatrix4fv(index, count, transpose, data);

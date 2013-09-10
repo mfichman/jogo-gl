@@ -7,9 +7,8 @@ import re
 out = open('Gl.jg', 'w')
 c = open('Gl.c', 'w')
 
-c.write('#include "OpenGL/gl.h"\n')
-c.write('#include "OpenGL/glu.h"\n')
-c.write('#include "Primitives.h"\n')
+c.write('#include "Gl\GlDefs.h"')
+c.write('#include "Primitives.h"')
 
 def jogo_type_name(name):
     # Converts an OpenGL type name to the equivalent Jogo type name

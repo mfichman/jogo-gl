@@ -1,5 +1,4 @@
-#include "OpenGL/gl.h"
-#include "OpenGL/glu.h"
+#include "Gl\GlDefs.h"
 #include "Primitives.h"
 void Gl_accum(Int op, Float value) {
     glAccum(op, value);

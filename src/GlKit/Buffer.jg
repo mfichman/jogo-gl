@@ -28,7 +28,7 @@ Buffer < Object {
     # an OpenGL 2.0+ vertex buffer object.  Data is stored temporarily in an
     # in-memory buffer before being synced with the hardware by setting the
     # 'state' attribute.
-    state mutable BufferState
+    state var BufferState
     target BufferTarget
     id Int
     size Int

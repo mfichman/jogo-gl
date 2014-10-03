@@ -20,25 +20,25 @@
 
 Matrix < Value {
     # 4x4 transformation matrix value type. 
-    m00 mutable Float
-    m01 mutable Float
-    m02 mutable Float
-    m03 mutable Float
+    m00 var Float
+    m01 var Float
+    m02 var Float
+    m03 var Float
 
-    m10 mutable Float
-    m11 mutable Float
-    m12 mutable Float
-    m13 mutable Float
+    m10 var Float
+    m11 var Float
+    m12 var Float
+    m13 var Float
 
-    m20 mutable Float
-    m21 mutable Float
-    m22 mutable Float
-    m23 mutable Float
+    m20 var Float
+    m21 var Float
+    m22 var Float
+    m23 var Float
 
-    m30 mutable Float
-    m31 mutable Float
-    m32 mutable Float
-    m33 mutable Float
+    m30 var Float
+    m31 var Float
+    m32 var Float
+    m33 var Float
 }
 
 perspective(fovy Float, aspect Float, near Float, far Float) Matrix {

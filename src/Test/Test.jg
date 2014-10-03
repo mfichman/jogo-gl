@@ -35,10 +35,8 @@ main() Int {
     buf.val3f(1., -1., 0.)
     buf.state = GlKit::BufferState::SYNCED
 
-    fd mutable = File::open('shaders/Flat.frag', 'r')
-    fs = fd.readall()
-    fd = File::open('shaders/Flat.vert', 'r')
-    vs = fd.readall()
+    fs = File::open('shaders/Flat.frag', 'r').readall()
+    vs = File::open('shaders/Flat.vert', 'r').readall()
     shader = GlKit::Shader(fs, vs)
     if shader.status == GlKit::ShaderStatus::ERROR {
         Io::println(shader.log)

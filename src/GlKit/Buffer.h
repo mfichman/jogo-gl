@@ -20,6 +20,9 @@
  * IN THE SOFTWARE.
  */
 
+#ifndef GLKIT_BUFFER_H
+#define GLKIT_BUFFER_H
+
 #include "Primitives.h"
 
 typedef Int GlKit_BufferState;
@@ -43,7 +46,7 @@ void GlKit_Buffer_val4f(GlKit_Buffer self, Float x, Float y, Float z, Float w);
 void GlKit_Buffer_val3f(GlKit_Buffer self, Float x, Float y, Float z);
 void GlKit_Buffer_val2f(GlKit_Buffer self, Float x, Float y);
 void GlKit_Buffer_val1f(GlKit_Buffer self, Float x);
-void GlKit_Buffer_state__s(GlKit_Buffer self, GlKit_BufferState state);
+void GlKit_Buffer_sync(GlKit_Buffer self);
 void GlKit_Buffer_clear(GlKit_Buffer self);
 extern Int GlKit_Buffer_DEFAULT_SIZE;
 extern void GlKit_Buffer__vtable();
@@ -53,3 +56,4 @@ extern GlKit_BufferTarget GlKit_BufferTarget_ELEMENT;
 extern GlKit_BufferState GlKit_BufferState_SYNCED;
 extern GlKit_BufferState GlKit_BufferState_DIRTY;
 
+#endif

@@ -22,25 +22,25 @@
 
 #include "Primitives.h"
 
-typedef Int GlKit_ShaderStatus;
+typedef Int GlKit_ProgramStatus;
 
-typedef struct GlKit_Shader* GlKit_Shader;
-struct GlKit_Shader {
+typedef struct GlKit_Program* GlKit_Program;
+struct GlKit_Program {
     Int _refcount;
     VoidPtr _vtable;
     Int id;
     Int fragment_shader_id;
     Int vertex_shader_id;
-    GlKit_ShaderStatus status;
+    GlKit_ProgramStatus status;
     String log;
 };
 
-Int GlKit_Shader_get_uniform_location(GlKit_Shader self, String name);
-void GlKit_Shader_bind_attrib_location(GlKit_Shader self, Int index, String name);
-void GlKit_Shader_check_status(GlKit_Shader self);
-extern GlKit_ShaderStatus GlKit_ShaderStatus_ERROR;
-extern GlKit_ShaderStatus GlKit_ShaderStatus_LINKED;
-extern Int GlKit_Shader_POSITION_ATTRIB;
-extern Int GlKit_Shader_NORMAL_ATTRIB;
-extern Int GlKit_Shader_TEXCOORD_ATTRIB;
+Int GlKit_Program_get_uniform_location(GlKit_Program self, String name);
+void GlKit_Program_bind_attrib_location(GlKit_Program self, Int index, String name);
+void GlKit_Program_check_status(GlKit_Program self);
+extern GlKit_ProgramStatus GlKit_ProgramStatus_ERROR;
+extern GlKit_ProgramStatus GlKit_ProgramStatus_LINKED;
+extern Int GlKit_Program_POSITION_ATTRIB;
+extern Int GlKit_Program_NORMAL_ATTRIB;
+extern Int GlKit_Program_TEXCOORD_ATTRIB;
 

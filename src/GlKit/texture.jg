@@ -1,4 +1,4 @@
-# Copyright (c) 2013 Matt Fichman
+# Copyright (c) 2014 Matt Fichman
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -18,14 +18,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-# These are gl* functions that the GlGen.py script isn't sophisticated enough
-# to parse yet.  They are included here manually.
-
-shader_source(id Int, source String) native {}
-get_uniform_location(id Int, name String) native Int {}
-bind_attrib_location(id Int, index Int, name String) native {}
-uniform_matrix(index Int, matrix GlKit::Matrix) native {}
-tex_image_2d(target Int, level Int, internalformat Int, width Int, height Int, border Int, format Int, type Int, pixels Buffer) native {}
-vertex_attrib_pointer(index Int, size Int, type Int, normalized Bool, stride Int, offset Int) native {}
-
-
+Texture < Object {
+    # Hardware texture buffer. Creates a new texture by calling glGenTextures.
+    # The texture resource is automatically released when the texture object
+    # is destroyed.
+    id Int
+}

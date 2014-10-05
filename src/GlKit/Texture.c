@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Matt Fichman
+ * Copyright (c) 2014 Matt Fichman
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -20,38 +20,24 @@
  * IN THE SOFTWARE.
  */
 
-#include "Primitives.h"
-#include "String.h"
+#include "GlKit/Texture.h"
 #include "Gl/GlDefs.h"
-#include "GlKit/Matrix.h"
+#include "Boot/Boot.h"
+#include "Os/Os.h"
 
-void Gl_shader_source(Int id, String data) {
-    GLchar const* strings = (GLchar const*)data->data;
-    GLint lengths = data->length;
-    glShaderSource(id, 1, &strings, &lengths);
+GlKit_Texture GlKit_Texture__init() {
+    // Initialize the OpenGL texture
+    GlKit_Texture ret = Boot_calloc(sizeof(struct GlKit_Texture));
+    GLuint id = 0;
+    ret->_vtable = GlKit_Texture__vtable;
+    ret->_refcount = 1;
+    glGenTextures(1, &id);
+    ret->id = id;
+    return ret;
 }
 
-
-Int Gl_get_uniform_location(Int id, String name) {
-    return glGetUniformLocation(id, (GLchar*)name->data);
-}
-
-void Gl_bind_attrib_location(Int id, Int index, String name) {
-    glBindAttribLocation(id, index, (GLchar*)name->data);
-}
-
-void Gl_uniform_matrix(Int index, GlKit_Matrix matrix) {
-    GLsizei const count = 1;
-    GLboolean const transpose = 1;
-    GLfloat data[16]; 
-    GLdouble* in = (GLdouble*)matrix;
-    Int i = 0;
-    for (i = 0; i < 16; ++i) {
-        data[i] = in[i];
-    } 
-    glUniformMatrix4fv(index, count, transpose, data);
-}
-
-void Gl_vertex_attrib_pointer(Int index, Int size, Int type, Bool normalized, Int stride, Int offset) {
-    glVertexAttribPointer(index, size, type, normalized, stride, (GLvoid*)offset);
+void GlKit_Texture__destroy(GlKit_Texture self) {
+    GLuint id = self->id;
+    glDeleteTextures(1, &id);
+    Boot_free(self);
 }

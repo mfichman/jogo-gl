@@ -21,7 +21,6 @@
  */
 
 #include "GlKit/Buffer.h"
-#include "GlKit/Shader.h"
 #include "Gl/GlDefs.h"
 #include "Boot/Boot.h"
 #include "Os/Os.h"
@@ -82,12 +81,10 @@ void GlKit_Buffer_val1f(GlKit_Buffer self, Float x) {
     self->state = GlKit_BufferState_DIRTY;
 }
 
-void GlKit_Buffer_state__s(GlKit_Buffer self, GlKit_BufferState state) {
+void GlKit_Buffer_sync(GlKit_Buffer self) {
     // Sets the state of the buffer, syncronizing with the hardware if the
     // state is set to 'synced' and the buffer is currently dirty.
-    if (state == self->state) { return; }
-    self->state = state;
-    if (state == GlKit_BufferState_SYNCED) {
+    if (self->state == GlKit_BufferState_DIRTY) {
         GLenum target = 0;
         if (GlKit_BufferTarget_VERTEX == self->target) {
             target = GL_ARRAY_BUFFER;
@@ -99,6 +96,7 @@ void GlKit_Buffer_state__s(GlKit_Buffer self, GlKit_BufferState state) {
         glBindBuffer(target, self->id);
         glBufferData(target, self->size, self->data, GL_STATIC_DRAW);        
         glBindBuffer(target, 0);
+        self->state = GlKit_BufferState_SYNCED;
     }
 }
 
@@ -106,19 +104,3 @@ void GlKit_Buffer_clear(GlKit_Buffer self) {
     self->size = 0;
     self->state = GlKit_BufferState_DIRTY;
 }
-
-void GlKit_Buffer_draw(GlKit_Buffer self, Int mode) {
-    if (GlKit_BufferTarget_VERTEX == self->target) {
-        glBindBuffer(GL_ARRAY_BUFFER, self->id);
-        glEnableVertexAttribArray(GlKit_Shader_POSITION_ATTRIB);
-        glVertexAttribPointer(GlKit_Shader_POSITION_ATTRIB, 3, GL_FLOAT, GL_FALSE, 0, 0);
-        glDrawArrays(mode, 0, self->size / 3 / sizeof(GLfloat)); 
-        glDisableVertexAttribArray(GlKit_Shader_POSITION_ATTRIB);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-    } else if (GlKit_BufferTarget_ELEMENT == self->target) {
-        Os_cpanic("Unsupported: can't draw an ELEMENT buffer");
-    } else {
-        Os_cpanic("Invalid BufferState");
-    }
-}
-

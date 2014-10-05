@@ -22,7 +22,26 @@ check() native {
 
 }
 
+POSITION_ATTRIB = 0
+
+
+create_program() GlKit::Program {
+    fs = File::open('shaders/Flat.frag', 'r').readall()
+    vs = File::open('shaders/Flat.vert', 'r').readall()
+    gs = nil
+    program = GlKit::Program(fs, vs, gs)
+
+    Gl::bind_attrib_location(program.id, POSITION_ATTRIB, 'position_in')
+
+    program.link()
+    if program.status == GlKit::ProgramStatus::ERROR {
+        Io::println(program.log)
+    }
+    ret program
+}
+
 main() Int {
+
     mode = GlKit::VideoMode(800, 600, 32, 24, GlKit::WindowMode::WINDOWED)
     window = GlKit::Window(mode)
     Gl::clear_color(.8, .8, .8, 1.)
@@ -33,25 +52,33 @@ main() Int {
     buf.val3f(-1., 1., 0.)
     buf.val3f(1., 1., 0.)
     buf.val3f(1., -1., 0.)
-    buf.state = GlKit::BufferState::SYNCED
+    buf.sync()
 
-    fs = File::open('shaders/Flat.frag', 'r').readall()
-    vs = File::open('shaders/Flat.vert', 'r').readall()
-    shader = GlKit::Shader(fs, vs)
-    if shader.status == GlKit::ShaderStatus::ERROR {
-        Io::println(shader.log)
-    }
+    #img = Png::Image('Sparks.png')
+    tex = GlKit::Texture()
 
-    Gl::use_program(shader.id)
-    shader.projection = GlKit::perspective(60., 800./600., 1., 100.)
-    shader.view = GlKit::identity()
-    shader.model = GlKit::translated(0., 0., -2.)
+    program = create_program()
+     
+    projection = Gl::get_uniform_location(program.id, 'projection_matrix')
+    view = Gl::get_uniform_location(program.id, 'view_matrix')
+    model = Gl::get_uniform_location(program.id, 'model_matrix')
+
+    Gl::use_program(program.id)
+    Gl::uniform_matrix(projection, GlKit::perspective(60., 800./600., 1., 100.))
+    Gl::uniform_matrix(view, GlKit::identity())
+    Gl::uniform_matrix(model, GlKit::translated(0., 0., -2.))
 
     while not window.closed {
         Gl::clear(Gl::COLOR_BUFFER_BIT)
         Gl::clear(Gl::DEPTH_BUFFER_BIT)
 
-        buf.draw(Gl::QUADS)
+        Gl::bind_buffer(Gl::ARRAY_BUFFER, buf.id)
+        Gl::enable_vertex_attrib_array(POSITION_ATTRIB)
+        Gl::vertex_attrib_pointer(POSITION_ATTRIB, 3, Gl::FLOAT, false, 0, 0)
+        Gl::draw_arrays(Gl::QUADS, 0, buf.size / 12)
+        Gl::disable_vertex_attrib_array(POSITION_ATTRIB)
+        Gl::bind_buffer(Gl::ARRAY_BUFFER, 0)
+
         window.display()
         GlKit::poll()
         yield

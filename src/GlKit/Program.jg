@@ -18,64 +18,40 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-ShaderStatus = LINKED | ERROR
+ProgramStatus = NONE | LINKED | ERROR
 
-Shader < Object {
+Program < Object {
     # Represents an GPU program.  Contains a vertex and a fragment shader.
-    POSITION_ATTRIB = 0
-    NORMAL_ATTRIB = 1
-    TEXCOORD_ATTRIB = 2
-
     id Int
     fragment_shader_id Int
     vertex_shader_id Int
-    status ShaderStatus
+    geometry_shader_id Int
+    status ProgramStatus
     log String
-    projection_matrix_loc Int
-    view_matrix_loc Int
-    model_matrix_loc Int
 
-    @init(fragment String, vertex String) {
+    @init(fragment String, vertex String, geometry String) {
         # Creates a new GPU program from source; 'frag' is the source for the
         # fragment shader, and 'vertex' is the source for the vertex shader.
-        fragment_shader_id = Gl::create_shader(Gl::FRAGMENT_SHADER)
-        Gl::shader_source(fragment_shader_id, fragment)
-        Gl::compile_shader(fragment_shader_id)
-    
-        vertex_shader_id = Gl::create_shader(Gl::VERTEX_SHADER)
-        Gl::shader_source(vertex_shader_id, vertex)
-        Gl::compile_shader(vertex_shader_id)
-            
         id = Gl::create_program()
-        Gl::attach_shader(id, fragment_shader_id)
-        Gl::attach_shader(id, vertex_shader_id)
-    
-        Gl::bind_attrib_location(id, POSITION_ATTRIB, 'position_in')
-        Gl::bind_attrib_location(id, NORMAL_ATTRIB, 'normal_in')
-        Gl::bind_attrib_location(id, TEXCOORD_ATTRIB, 'texcoord_in')
 
+        if fragment {
+            fragment_shader_id = Gl::create_shader(Gl::FRAGMENT_SHADER)
+            Gl::shader_source(fragment_shader_id, fragment)
+            Gl::compile_shader(fragment_shader_id)
+            Gl::attach_shader(id, fragment_shader_id)
+        }
+
+        if vertex {
+            vertex_shader_id = Gl::create_shader(Gl::VERTEX_SHADER)
+            Gl::shader_source(vertex_shader_id, vertex)
+            Gl::compile_shader(vertex_shader_id)
+            Gl::attach_shader(id, vertex_shader_id)
+        }
+    }
+
+    link() {
         Gl::link_program(id)
-
         self.check_status()
-
-        projection_matrix_loc = Gl::get_uniform_location(id, 'projection_matrix')
-        view_matrix_loc = Gl::get_uniform_location(id, 'view_matrix')
-        model_matrix_loc = Gl::get_uniform_location(id, 'model_matrix')
-    }
-    
-    projection=(mat Matrix) {
-        # Set the projection matrix uniform (binding is always projection_matrix)
-        Gl::uniform_matrix(projection_matrix_loc, mat)
-    }
-    
-    view=(mat Matrix) {
-        # Set the view matrix uniform (binding is alwyas view_matrix)
-        Gl::uniform_matrix(view_matrix_loc, mat)
-    }
-
-    model=(mat Matrix) {
-        # Set the model matrix uniform (binding is always model_matrix)
-        Gl::uniform_matrix(model_matrix_loc, mat)
     }
 
     @destroy() {
@@ -83,6 +59,7 @@ Shader < Object {
         Gl::delete_program(id)
         Gl::delete_shader(fragment_shader_id)
         Gl::delete_shader(vertex_shader_id)
+        Gl::delete_shader(geometry_shader_id)
     }
 
     check_status() private native {

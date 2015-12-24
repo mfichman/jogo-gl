@@ -20,13 +20,13 @@
  * IN THE SOFTWARE.
  */
 
-#include "GlKit/Shader.h"
+#include "GlKit/Program.h"
 #include "Gl/GlDefs.h"
 #include "String.h"
 
 #include <stdio.h>
 
-void GlKit_Shader_check_status(GlKit_Shader self) {
+void GlKit_Program_check_status(GlKit_Program self) {
     // Check the status of the shader and get the error log.
     GLint success = 0;
     GLint program_len = 0;
@@ -35,10 +35,10 @@ void GlKit_Shader_check_status(GlKit_Shader self) {
     GLchar* buf = 0;
     glGetProgramiv(self->id, GL_LINK_STATUS, &success);
     if (success) {
-        self->status = GlKit_ShaderStatus_LINKED;
+        self->status = GlKit_ProgramStatus_LINKED;
         return;
     } else {
-        self->status = GlKit_ShaderStatus_ERROR;
+        self->status = GlKit_ProgramStatus_ERROR;
     }
         
     glGetShaderiv(self->vertex_shader_id, GL_INFO_LOG_LENGTH, &vshader_len);

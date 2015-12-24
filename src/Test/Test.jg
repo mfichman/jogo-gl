@@ -22,7 +22,26 @@ check() native {
 
 }
 
+POSITION_ATTRIB = 0
+
+
+create_program() GlKit::Program {
+    fs = File::open('shaders/Flat.frag', 'r').readall()
+    vs = File::open('shaders/Flat.vert', 'r').readall()
+    gs = nil
+    program = GlKit::Program(fs, vs, gs)
+
+    Gl::bind_attrib_location(program.id, POSITION_ATTRIB, 'position_in')
+
+    program.link()
+    if program.status == GlKit::ProgramStatus::ERROR {
+        Io::println(program.log)
+    }
+    ret program
+}
+
 main() Int {
+
     mode = GlKit::VideoMode(800, 600, 32, 24, GlKit::WindowMode::WINDOWED)
     window = GlKit::Window(mode)
     Gl::clear_color(.8, .8, .8, 1.)
@@ -40,8 +59,7 @@ main() Int {
 
     buf.val3f(1., -1., 0.)
     buf.val2f(0., 0.)
-
-    buf.state = GlKit::BufferState::SYNCED
+    buf.sync()
 
     fs = File::open('shaders/Flat.frag', 'r').readall()
     vs = File::open('shaders/Flat.vert', 'r').readall()
@@ -61,6 +79,9 @@ main() Int {
     shader.view = GlKit::identity()
     shader.model = GlKit::translated(0., 0., -2.)
     shader.vertices = buf
+
+    #img = Png::Image('Sparks.png')
+    tex = GlKit::Texture()
 
     while not window.closed {
         Gl::clear(Gl::COLOR_BUFFER_BIT)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Matt Fichman
+ * Copyright (c) 2014 Matt Fichman
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -20,40 +20,20 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef GLKIT_BUFFER_H
-#define GLKIT_BUFFER_H
+#ifndef GLKIT_TEXTURE_H
+#define GLKIT_TEXTURE_H
 
 #include "Primitives.h"
 
-typedef Int GlKit_BufferState;
-typedef Int GlKit_BufferTarget;
-
-typedef struct GlKit_Buffer* GlKit_Buffer;
-struct GlKit_Buffer {
+typedef struct GlKit_Texture* GlKit_Texture;
+struct GlKit_Texture {
     VoidPtr _vtable;
     U64 _refcount;
-    GlKit_BufferState state;
-    GlKit_BufferTarget target;
     Int id;  
-    Int size;
-    Int capacity;
-    Byte* data; 
 };
 
-GlKit_Buffer GlKit_Buffer__init();
-void GlKit_Buffer__destroy(GlKit_Buffer self);
-void GlKit_Buffer_val4f(GlKit_Buffer self, Float x, Float y, Float z, Float w);
-void GlKit_Buffer_val3f(GlKit_Buffer self, Float x, Float y, Float z);
-void GlKit_Buffer_val2f(GlKit_Buffer self, Float x, Float y);
-void GlKit_Buffer_val1f(GlKit_Buffer self, Float x);
-void GlKit_Buffer_sync(GlKit_Buffer self);
-void GlKit_Buffer_clear(GlKit_Buffer self);
-extern Int GlKit_Buffer_DEFAULT_SIZE;
-extern void GlKit_Buffer__vtable();
-
-extern GlKit_BufferTarget GlKit_BufferTarget_VERTEX;
-extern GlKit_BufferTarget GlKit_BufferTarget_INDEX;
-extern GlKit_BufferState GlKit_BufferState_SYNCED;
-extern GlKit_BufferState GlKit_BufferState_DIRTY;
+GlKit_Texture GlKit_Texture__init();
+void GlKit_Texture__destroy(GlKit_Texture self);
+extern void GlKit_Texture__vtable();
 
 #endif

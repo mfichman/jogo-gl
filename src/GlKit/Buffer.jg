@@ -28,7 +28,7 @@ Buffer < Object {
     # an OpenGL 2.0+ vertex buffer object.  Data is stored temporarily in an
     # in-memory buffer before being synced with the hardware by setting the
     # 'state' attribute.
-    state mutable BufferState
+    state BufferState
     target BufferTarget
     id Int
     size Int
@@ -42,7 +42,7 @@ Buffer < Object {
     val3f(x Float, y Float, z Float) native {}
     val2f(x Float, y Float) native {}
     val1f(x Float) native {}
-    state=(state BufferState) native {}
+    sync() native {}
 }
 
 VertexBuffer < Object {

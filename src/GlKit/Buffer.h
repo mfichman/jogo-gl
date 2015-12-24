@@ -49,7 +49,7 @@ extern Int GlKit_Buffer_DEFAULT_SIZE;
 extern void GlKit_Buffer__vtable();
 
 extern GlKit_BufferTarget GlKit_BufferTarget_VERTEX;
-extern GlKit_BufferTarget GlKit_BufferTarget_ELEMENT;
+extern GlKit_BufferTarget GlKit_BufferTarget_INDEX;
 extern GlKit_BufferState GlKit_BufferState_SYNCED;
 extern GlKit_BufferState GlKit_BufferState_DIRTY;
 

@@ -61,3 +61,4 @@ void GlKit_Shader_check_status(GlKit_Shader self) {
        buf += program_len;
     }
 }
+

@@ -28,18 +28,30 @@ main() Int {
     Gl::clear_color(.8, .8, .8, 1.)
     Gl::viewport(0, 0, 800, 600) 
 
-    buf = GlKit::Buffer(GlKit::BufferTarget::VERTEX)
+    buf = GlKit::VertexBuffer()
     buf.val3f(-1., -1., 0.)
+    buf.val2f(0., 0.) # texcoord
+
     buf.val3f(-1., 1., 0.)
+    buf.val2f(0., 0.)
+
     buf.val3f(1., 1., 0.)
+    buf.val2f(0., 0.)
+
     buf.val3f(1., -1., 0.)
+    buf.val2f(0., 0.)
+
     buf.state = GlKit::BufferState::SYNCED
 
-    fd mutable = File::open('shaders/Flat.frag', 'r')
-    fs = fd.readall()
-    fd = File::open('shaders/Flat.vert', 'r')
-    vs = fd.readall()
-    shader = GlKit::Shader(fs, vs)
+    fs = File::open('shaders/Flat.frag', 'r').readall()
+    vs = File::open('shaders/Flat.vert', 'r').readall()
+
+    vf = GlKit::VertexFormat()
+    vf.attribute("position_in", 3, Gl::FLOAT)
+    #vf.attribute("normal_in", 3, Gl::FLOAT)
+    vf.attribute("texcoord_in", 2, Gl::FLOAT)
+
+    shader = GlKit::Shader(fs, vs, vf)
     if shader.status == GlKit::ShaderStatus::ERROR {
         Io::println(shader.log)
     }
@@ -48,12 +60,14 @@ main() Int {
     shader.projection = GlKit::perspective(60., 800./600., 1., 100.)
     shader.view = GlKit::identity()
     shader.model = GlKit::translated(0., 0., -2.)
+    shader.vertices = buf
 
     while not window.closed {
         Gl::clear(Gl::COLOR_BUFFER_BIT)
         Gl::clear(Gl::DEPTH_BUFFER_BIT)
 
-        buf.draw(Gl::QUADS)
+        shader.draw(Gl::QUADS)
+        #buf.draw(Gl::QUADS)
         window.display()
         GlKit::poll()
         yield

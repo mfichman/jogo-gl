@@ -34,10 +34,15 @@ Shader < Object {
     projection_matrix_loc Int
     view_matrix_loc Int
     model_matrix_loc Int
+    format VertexFormat
+    vertex_size Int
+    vertices mutable GlKit::VertexBuffer
+    indices mutable GlKit::Buffer
 
-    @init(fragment String, vertex String) {
+    @init(fragment String, vertex String, pformat VertexFormat) {
         # Creates a new GPU program from source; 'frag' is the source for the
         # fragment shader, and 'vertex' is the source for the vertex shader.
+        format = pformat
         fragment_shader_id = Gl::create_shader(Gl::FRAGMENT_SHADER)
         Gl::shader_source(fragment_shader_id, fragment)
         Gl::compile_shader(fragment_shader_id)
@@ -50,12 +55,15 @@ Shader < Object {
         Gl::attach_shader(id, fragment_shader_id)
         Gl::attach_shader(id, vertex_shader_id)
     
-        Gl::bind_attrib_location(id, POSITION_ATTRIB, 'position_in')
-        Gl::bind_attrib_location(id, NORMAL_ATTRIB, 'normal_in')
-        Gl::bind_attrib_location(id, TEXCOORD_ATTRIB, 'texcoord_in')
+        # Bind attribute names to their locations in the shader
+        attrib mutable = 0
+        for pair in format {
+            Gl::bind_attrib_location(id, attrib, pair.first)
+            vertex_size = vertex_size + pair.second.bytes
+            ++attrib
+        }
 
         Gl::link_program(id)
-
         self.check_status()
 
         projection_matrix_loc = Gl::get_uniform_location(id, 'projection_matrix')
@@ -88,6 +96,62 @@ Shader < Object {
     check_status() private native {
         # Checks the status of the shader compilation.
     }
+
+    draw(mode Int) {
+        # Draws the current vertex buffer (uses the index buffer if present)
+        Gl::bind_buffer(Gl::ARRAY_BUFFER, vertices.id)
+        attrib mutable = 0
+        bytes mutable = 0
+        for pair in format {
+            af = pair.second
+            Gl::enable_vertex_attrib_array(attrib)
+            Gl::vertex_attrib_pointer(attrib, af.components, af.type, false, vertex_size, bytes)
+            ++attrib
+            bytes = bytes + af.bytes
+        }
+        Gl::draw_arrays(mode, 0, vertices.size / vertex_size)
+        Gl::bind_buffer(Gl::ARRAY_BUFFER, 0)
+    }
 }
 
+AttributeFormat < Object {
+    # Specifies the format of a single attribute in a vertex format.  For
+    # example, if the attribute in GLSL was defined to be "attribute vec3 pos,"
+    # then the corresponding AttributeFormat would have 3 components with type
+    # Gl::FLOAT.
+    components Int # Number of components (e.g., 3 for vec3f)
+    type Int # Type of the attribute (e.g., Gl::FLOAT or Gl::INT)
+    bytes Int # Size in bytes
 
+    @init(pcomponents Int, ptype Int) {
+        # Creates a new AttributeFormat object, which describes a single
+        # attribute in the vertex.
+        components = pcomponents
+        type = ptype
+        bytes = match ptype {
+        with Gl::FLOAT: 4 * components
+        with Gl::INT: 4 * components
+        with Gl::UNSIGNED_INT: 4 * components
+        with *:
+            Os::panic("Unsupported vertex attribute type")
+            0
+        }
+    }
+}
+
+VertexFormat < Object {
+    # A vertex format defines the attribute inputs to a shader.  For each
+    # attribute in the shader, call the attribute() function with the type and
+    # number of components defined for the attribute in the shader.  Then, set
+    # the shader's vertex format.  When a buffer is assigned to the shader, it
+    # will be interpreted using the given vertex format.
+    format private = Hash[String,AttributeFormat]()
+    
+    attribute(name String, components Int, type Int) {
+        format[name] = AttributeFormat(components, type)
+    }
+    
+    iter() HashIter[String,AttributeFormat] {
+        ret format.iter()
+    }
+}

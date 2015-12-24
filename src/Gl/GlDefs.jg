@@ -25,5 +25,5 @@ shader_source(id Int, source String) native
 get_uniform_location(id Int, name String) native Int
 bind_attrib_location(id Int, index Int, name String) native
 uniform_matrix(index Int, matrix GlKit::Matrix) native
-
+vertex_attrib_pointer(index Int, size Int, type Int, normalized Bool, stride Int, pointer Int) native
 

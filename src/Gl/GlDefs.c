@@ -51,3 +51,7 @@ void Gl_uniform_matrix(Int index, GlKit_Matrix matrix) {
     } 
     glUniformMatrix4fv(index, count, transpose, data);
 }
+
+void Gl_vertex_attrib_pointer(Int index, Int size, Int type, Bool normalized, Int stride, Int pointer) {
+    glVertexAttribPointer(index, size, type, normalized, stride, pointer);
+}

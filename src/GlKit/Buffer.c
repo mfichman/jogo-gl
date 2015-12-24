@@ -91,7 +91,7 @@ void GlKit_Buffer_state__s(GlKit_Buffer self, GlKit_BufferState state) {
         GLenum target = 0;
         if (GlKit_BufferTarget_VERTEX == self->target) {
             target = GL_ARRAY_BUFFER;
-        } else if (GlKit_BufferTarget_ELEMENT == self->target) {
+        } else if (GlKit_BufferTarget_INDEX == self->target) {
             target = GL_ELEMENT_ARRAY_BUFFER;
         } else {
             Os_cpanic("Invalid BufferState");
@@ -105,20 +105,5 @@ void GlKit_Buffer_state__s(GlKit_Buffer self, GlKit_BufferState state) {
 void GlKit_Buffer_clear(GlKit_Buffer self) {
     self->size = 0;
     self->state = GlKit_BufferState_DIRTY;
-}
-
-void GlKit_Buffer_draw(GlKit_Buffer self, Int mode) {
-    if (GlKit_BufferTarget_VERTEX == self->target) {
-        glBindBuffer(GL_ARRAY_BUFFER, self->id);
-        glEnableVertexAttribArray(GlKit_Shader_POSITION_ATTRIB);
-        glVertexAttribPointer(GlKit_Shader_POSITION_ATTRIB, 3, GL_FLOAT, GL_FALSE, 0, 0);
-        glDrawArrays(mode, 0, self->size / 3 / sizeof(GLfloat)); 
-        glDisableVertexAttribArray(GlKit_Shader_POSITION_ATTRIB);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-    } else if (GlKit_BufferTarget_ELEMENT == self->target) {
-        Os_cpanic("Unsupported: can't draw an ELEMENT buffer");
-    } else {
-        Os_cpanic("Invalid BufferState");
-    }
 }
 

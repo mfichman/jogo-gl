@@ -1,3 +1,3 @@
 # jogo-gl
 
-OpenGL wrapper for Jogo programs
+OpenGL wrapper library for Jogo programs.

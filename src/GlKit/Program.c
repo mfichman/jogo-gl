@@ -61,3 +61,4 @@ void GlKit_Program_check_status(GlKit_Program self) {
        buf += program_len;
     }
 }
+

@@ -49,39 +49,52 @@ main() Int {
     Gl::clear_color(.8, .8, .8, 1.)
     Gl::viewport(0, 0, 800, 600) 
 
-    buf = GlKit::Buffer(GlKit::BufferTarget::VERTEX)
+    buf = GlKit::VertexBuffer()
     buf.val3f(-1., -1., 0.)
+    buf.val2f(0., 0.) # texcoord
+
     buf.val3f(-1., 1., 0.)
+    buf.val2f(0., 0.)
+
     buf.val3f(1., 1., 0.)
+    buf.val2f(0., 0.)
+
     buf.val3f(1., -1., 0.)
+    buf.val2f(0., 0.)
     buf.sync()
 
     img = Png::Image('Sparks.png')
     tex = GlKit::Texture()
     Gl::tex_image_2d(Gl:TEXTURE_2D,
 
-    program = create_program()
-     
-    projection = Gl::get_uniform_location(program.id, 'projection_matrix')
-    view = Gl::get_uniform_location(program.id, 'view_matrix')
-    model = Gl::get_uniform_location(program.id, 'model_matrix')
+    fs = File::open('shaders/Flat.frag', 'r').readall()
+    vs = File::open('shaders/Flat.vert', 'r').readall()
 
-    Gl::use_program(program.id)
-    Gl::uniform_matrix(projection, GlKit::perspective(60., 800./600., 1., 100.))
-    Gl::uniform_matrix(view, GlKit::identity())
-    Gl::uniform_matrix(model, GlKit::translated(0., 0., -2.))
+    vf = GlKit::VertexFormat()
+    vf.attribute("position_in", 3, Gl::FLOAT)
+    #vf.attribute("normal_in", 3, Gl::FLOAT)
+    vf.attribute("texcoord_in", 2, Gl::FLOAT)
+
+    shader = GlKit::Shader(fs, vs, vf)
+    if shader.status == GlKit::ShaderStatus::ERROR {
+        Io::println(shader.log)
+    }
+
+    Gl::use_program(shader.id)
+    shader.projection = GlKit::perspective(60., 800./600., 1., 100.)
+    shader.view = GlKit::identity()
+    shader.model = GlKit::translated(0., 0., -2.)
+    shader.vertices = buf
+
+    img = Png::Image('Sparks.png')
+    tex = GlKit::Texture()
 
     while not window.closed {
         Gl::clear(Gl::COLOR_BUFFER_BIT)
         Gl::clear(Gl::DEPTH_BUFFER_BIT)
 
-        Gl::bind_buffer(Gl::ARRAY_BUFFER, buf.id)
-        Gl::enable_vertex_attrib_array(POSITION_ATTRIB)
-        Gl::vertex_attrib_pointer(POSITION_ATTRIB, 3, Gl::FLOAT, false, 0, 0)
-        Gl::draw_arrays(Gl::QUADS, 0, buf.size / 12)
-        Gl::disable_vertex_attrib_array(POSITION_ATTRIB)
-        Gl::bind_buffer(Gl::ARRAY_BUFFER, 0)
-
+        shader.draw(Gl::QUADS)
+        #buf.draw(Gl::QUADS)
         window.display()
         GlKit::poll()
         yield

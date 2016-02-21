@@ -19,10 +19,10 @@
 # SOFTWARE.
 
 BufferState = DIRTY | SYNCED
-BufferTarget = VERTEX | ELEMENT
+BufferTarget = VERTEX | INDEX
 
 Buffer < Object {
-    # Hardware vertex or normal buffer.  The interface of this buffer is meant
+    # Hardware vertex or index buffer.  The interface of this buffer is meant
     # to be similar to OpenGL 1.1 vertex/normal/color functions, because those
     # are well-understood and easy to use.  However, the buffer actually uses
     # an OpenGL 2.0+ vertex buffer object.  Data is stored temporarily in an
@@ -43,4 +43,13 @@ Buffer < Object {
     val2f(x Float, y Float) native {}
     val1f(x Float) native {}
     sync() native {}
+}
+
+VertexBuffer < Object {
+    # Hardware vertex buffer.  This type of buffer is used to store vertices.
+    buffer embedded = Buffer(BufferTarget::VERTEX)
+}
+
+IndexBuffer < Object {
+    buffer embedded = Buffer(BufferTarget::INDEX)
 }

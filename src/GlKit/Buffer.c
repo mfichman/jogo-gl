@@ -88,7 +88,7 @@ void GlKit_Buffer_sync(GlKit_Buffer self) {
         GLenum target = 0;
         if (GlKit_BufferTarget_VERTEX == self->target) {
             target = GL_ARRAY_BUFFER;
-        } else if (GlKit_BufferTarget_ELEMENT == self->target) {
+        } else if (GlKit_BufferTarget_INDEX == self->target) {
             target = GL_ELEMENT_ARRAY_BUFFER;
         } else {
             Os_cpanic("Invalid BufferState");

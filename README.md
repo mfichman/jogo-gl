@@ -1,4 +1,3 @@
-jogo-gl
-=======
+# jogo-gl
 
-OpenGL wrapper for Jogo
+OpenGL wrapper for Jogo programs
